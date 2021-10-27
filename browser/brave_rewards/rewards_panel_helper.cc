@@ -38,7 +38,6 @@ bool ShowPanel(content::BrowserContext* context,
   if (!popup_shown) {
     return false;
   }
-
   return true;
 }
 
