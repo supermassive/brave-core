@@ -98,10 +98,6 @@ class BatLedgerClientMojoBridge :
 
   void ReconcileStampReset() override;
 
-  void RunDBTransaction(
-      ledger::type::DBTransactionPtr transaction,
-      ledger::client::RunDBTransactionCallback callback) override;
-
   void GetCreateScript(
       ledger::client::GetCreateScriptCallback callback) override;
 

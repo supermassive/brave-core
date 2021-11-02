@@ -57,7 +57,7 @@ void DatabaseServerPublisherInfo::InsertOrUpdate(
   transaction->commands.push_back(std::move(command));
   banner_->InsertOrUpdate(transaction.get(), server_info);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       std::bind(&OnResultCallback, _1, callback));
 }
@@ -118,7 +118,7 @@ void DatabaseServerPublisherInfo::OnGetRecordBanner(
           *banner,
           callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       transaction_callback);
 }
@@ -181,7 +181,7 @@ void DatabaseServerPublisherInfo::DeleteExpiredRecords(
           _1,
           callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       select_callback);
 }
@@ -224,7 +224,7 @@ void DatabaseServerPublisherInfo::OnExpiredRecordsSelected(
 
   transaction->commands.push_back(std::move(command));
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       std::bind(&OnResultCallback, _1, callback));
 }

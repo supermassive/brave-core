@@ -270,6 +270,8 @@ ledger::type::DBCommandResponsePtr RunDBTransactionOnTaskRunner(
 
   auto options = ledger::mojom::LedgerOptions::New();
   options->execute_create_script = executeMigrateScript;
+  options->database_path =
+      base::FilePath([self rewardsDatabasePath].UTF8String);
 
   BLOG(3, @"DB: Migrate from CoreData? %@",
        (executeMigrateScript ? @"YES" : @"NO"));

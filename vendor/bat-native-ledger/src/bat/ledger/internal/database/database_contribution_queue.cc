@@ -74,7 +74,7 @@ void DatabaseContributionQueue::InsertOrUpdate(
           shared_info,
           callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       transaction_callback);
 }
@@ -131,7 +131,7 @@ void DatabaseContributionQueue::GetFirstRecord(
           _1,
           callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       transaction_callback);
 }
@@ -214,7 +214,7 @@ void DatabaseContributionQueue::MarkRecordAsComplete(
       _1,
       callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       transaction_callback);
 }

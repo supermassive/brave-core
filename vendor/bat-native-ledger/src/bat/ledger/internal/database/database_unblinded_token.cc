@@ -74,7 +74,7 @@ void DatabaseUnblindedToken::InsertOrUpdateList(
       _1,
       callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       transaction_callback);
 }
@@ -147,7 +147,7 @@ void DatabaseUnblindedToken::GetSpendableRecordsByTriggerIds(
       _1,
       callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       transaction_callback);
 }
@@ -185,7 +185,7 @@ void DatabaseUnblindedToken::MarkRecordListAsSpent(
       _1,
       callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       transaction_callback);
 }
@@ -260,7 +260,7 @@ void DatabaseUnblindedToken::MarkRecordListAsReserved(
           ids.size(),
           callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       transaction_callback);
 }
@@ -313,7 +313,7 @@ void DatabaseUnblindedToken::MarkRecordListAsSpendable(
       _1,
       callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       transaction_callback);
 }
@@ -357,7 +357,7 @@ void DatabaseUnblindedToken::GetReservedRecordList(
       _1,
       callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       transaction_callback);
 }
@@ -409,7 +409,7 @@ void DatabaseUnblindedToken::GetSpendableRecordListByBatchTypes(
       _1,
       callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       transaction_callback);
 }

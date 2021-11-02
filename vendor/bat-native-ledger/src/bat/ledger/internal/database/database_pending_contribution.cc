@@ -70,7 +70,7 @@ void DatabasePendingContribution::InsertOrUpdateList(
       _1,
       callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       transaction_callback);
 }
@@ -98,7 +98,7 @@ void DatabasePendingContribution::GetReservedAmount(
           _1,
           callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       transaction_callback);
 }
@@ -161,7 +161,7 @@ void DatabasePendingContribution::GetAllRecords(
           _1,
           callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       transaction_callback);
 }
@@ -225,7 +225,7 @@ void DatabasePendingContribution::GetUnverifiedPublishers(
   auto transaction = type::DBTransaction::New();
   transaction->commands.push_back(std::move(command));
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       std::bind(&DatabasePendingContribution::OnGetUnverifiedPublishers, this,
                 _1, std::move(callback)));
@@ -276,7 +276,7 @@ void DatabasePendingContribution::DeleteRecord(
       _1,
       callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       transaction_callback);
 }
@@ -296,7 +296,7 @@ void DatabasePendingContribution::DeleteAllRecords(
       _1,
       callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       transaction_callback);
 }

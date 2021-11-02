@@ -13,6 +13,9 @@
 #include <string>
 #include <vector>
 
+#include "base/files/file_path.h"
+#include "base/memory/weak_ptr.h"
+
 #include "bat/ledger/internal/database/database_activity_info.h"
 #include "bat/ledger/internal/database/database_balance_report.h"
 #include "bat/ledger/internal/database/database_contribution_info.h"
@@ -36,7 +39,9 @@
 #include "bat/ledger/ledger.h"
 
 namespace ledger {
+
 class LedgerImpl;
+class LedgerDatabaseImpl;
 
 namespace database {
 
@@ -45,9 +50,12 @@ class Database {
   explicit Database(LedgerImpl* ledger);
   virtual ~Database();
 
-  void Initialize(
-      const bool execute_create_script,
-      ledger::ResultCallback callback);
+  void Initialize(const base::FilePath& database_path,
+                  const bool execute_create_script,
+                  ledger::ResultCallback callback);
+
+  void RunDBTransaction(mojom::DBTransactionPtr transaction,
+                        client::RunDBTransactionCallback callback);
 
   void Close(ledger::ResultCallback callback);
 
@@ -429,6 +437,10 @@ class Database {
       GetUnblindedTokenListCallback callback);
 
  private:
+  void PostDatabaseResponse(mojom::DBCommandResponsePtr response,
+                            client::RunDBTransactionCallback callback);
+
+  std::unique_ptr<LedgerDatabaseImpl> ledger_database_;
   std::unique_ptr<DatabaseInitialize> initialize_;
   std::unique_ptr<DatabaseActivityInfo> activity_info_;
   std::unique_ptr<DatabaseBalanceReport> balance_report_;
@@ -449,6 +461,7 @@ class Database {
   std::unique_ptr<DatabaseSKUTransaction> sku_transaction_;
   std::unique_ptr<DatabaseUnblindedToken> unblinded_token_;
   LedgerImpl* ledger_;  // NOT OWNED
+  base::WeakPtrFactory<Database> weak_factory_{this};
 };
 
 }  // namespace database

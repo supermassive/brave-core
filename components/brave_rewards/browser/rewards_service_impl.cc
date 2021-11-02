@@ -38,7 +38,6 @@
 #include "base/time/time.h"
 #include "bat/ads/pref_names.h"
 #include "bat/ledger/global_constants.h"
-#include "bat/ledger/ledger_database.h"
 #include "brave/browser/brave_ads/ads_service_factory.h"
 #include "brave/browser/ui/webui/brave_rewards_source.h"
 #include "brave/components/brave_ads/browser/ads_service.h"
@@ -354,9 +353,6 @@ RewardsServiceImpl::~RewardsServiceImpl() {
   }
 #endif
 
-  if (ledger_database_) {
-    file_task_runner_->DeleteSoon(FROM_HERE, ledger_database_.release());
-  }
   StopNotificationTimers();
 }
 
@@ -459,9 +455,6 @@ void RewardsServiceImpl::StartLedgerProcessIfNecessary() {
     return;
   }
 
-  ledger_database_.reset(
-      ledger::LedgerDatabase::CreateInstance(publisher_info_db_path_));
-
   BLOG(1, "Starting ledger process");
 
   if (!bat_ledger_service_.is_bound()) {
@@ -511,8 +504,11 @@ void RewardsServiceImpl::OnLedgerCreated() {
 
   PrepareLedgerEnvForTesting();
 
+  auto options = ledger::mojom::LedgerOptions::New();
+  options->database_path = publisher_info_db_path_;
+
   bat_ledger_->Initialize(
-      ledger::mojom::LedgerOptions::New(),
+      std::move(options),
       base::BindOnce(&RewardsServiceImpl::OnLedgerInitialized, AsWeakPtr()));
 }
 
@@ -1485,9 +1481,6 @@ void RewardsServiceImpl::Reset() {
   bat_ledger_client_receiver_.reset();
   bat_ledger_service_.reset();
   ready_ = std::make_unique<base::OneShotEvent>();
-  bool success =
-      file_task_runner_->DeleteSoon(FROM_HERE, ledger_database_.release());
-  BLOG_IF(1, !success, "Database was not released");
   BLOG(1, "Successfully reset rewards service");
 }
 
@@ -3166,38 +3159,6 @@ void RewardsServiceImpl::ReconcileStampReset() {
   for (auto& observer : observers_) {
     observer.ReconcileStampReset();
   }
-}
-
-ledger::type::DBCommandResponsePtr RunDBTransactionOnFileTaskRunner(
-    ledger::type::DBTransactionPtr transaction,
-    ledger::LedgerDatabase* database) {
-  auto response = ledger::type::DBCommandResponse::New();
-  if (!database) {
-    response->status = ledger::type::DBCommandResponse::Status::RESPONSE_ERROR;
-  } else {
-    database->RunTransaction(std::move(transaction), response.get());
-  }
-
-  return response;
-}
-
-void RewardsServiceImpl::RunDBTransaction(
-    ledger::type::DBTransactionPtr transaction,
-    ledger::client::RunDBTransactionCallback callback) {
-  DCHECK(ledger_database_);
-  base::PostTaskAndReplyWithResult(
-      file_task_runner_.get(), FROM_HERE,
-      base::BindOnce(&RunDBTransactionOnFileTaskRunner, std::move(transaction),
-                     ledger_database_.get()),
-      base::BindOnce(&RewardsServiceImpl::OnRunDBTransaction, AsWeakPtr(),
-                     std::move(callback)));
-}
-
-void RewardsServiceImpl::OnRunDBTransaction(
-    ledger::client::RunDBTransactionCallback callback,
-    ledger::type::DBCommandResponsePtr response) {
-  DCHECK_CALLED_ON_VALID_SEQUENCE(sequence_checker_);
-  callback(std::move(response));
 }
 
 void RewardsServiceImpl::GetCreateScript(

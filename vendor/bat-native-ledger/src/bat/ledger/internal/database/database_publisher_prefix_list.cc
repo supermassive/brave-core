@@ -79,7 +79,7 @@ void DatabasePublisherPrefixList::Search(
   auto transaction = type::DBTransaction::New();
   transaction->commands.push_back(std::move(command));
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       [callback](type::DBCommandResponsePtr response) {
         if (!response || !response->result ||
@@ -143,7 +143,7 @@ void DatabasePublisherPrefixList::InsertNext(
 
   auto iter = std::get<publisher::PrefixIterator>(insert_tuple);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       [this, iter, callback](type::DBCommandResponsePtr response) {
         if (!response ||

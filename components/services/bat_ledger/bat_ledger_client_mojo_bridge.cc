@@ -317,20 +317,6 @@ void BatLedgerClientMojoBridge::ReconcileStampReset() {
   bat_ledger_client_->ReconcileStampReset();
 }
 
-void OnRunDBTransaction(
-    const ledger::client::RunDBTransactionCallback& callback,
-    ledger::type::DBCommandResponsePtr response) {
-  callback(std::move(response));
-}
-
-void BatLedgerClientMojoBridge::RunDBTransaction(
-    ledger::type::DBTransactionPtr transaction,
-    ledger::client::RunDBTransactionCallback callback) {
-  bat_ledger_client_->RunDBTransaction(
-      std::move(transaction),
-      base::BindOnce(&OnRunDBTransaction, std::move(callback)));
-}
-
 void OnGetCreateScript(
     const ledger::client::GetCreateScriptCallback& callback,
     const std::string& script,

@@ -168,7 +168,7 @@ void DatabaseActivityInfo::NormalizeList(
   auto shared_list = std::make_shared<type::PublisherInfoList>(
       std::move(list));
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       [this, shared_list, callback](type::DBCommandResponsePtr response) {
         if (!response || response->status !=
@@ -218,7 +218,7 @@ void DatabaseActivityInfo::InsertOrUpdate(
       _1,
       callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       transaction_callback);
 }
@@ -280,7 +280,7 @@ void DatabaseActivityInfo::GetRecordsList(
       _1,
       callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       transaction_callback);
 }
@@ -349,7 +349,7 @@ void DatabaseActivityInfo::DeleteRecord(
       _1,
       callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       transaction_callback);
 }

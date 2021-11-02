@@ -229,8 +229,6 @@ interface BatLedgerClient {
 
   ReconcileStampReset();
 
-  RunDBTransaction(ledger.mojom.DBTransaction transaction) => (ledger.mojom.DBCommandResponse response);
-
   GetCreateScript() => (string script, int32 table_version);
 
   PendingContributionSaved(ledger.mojom.Result result);

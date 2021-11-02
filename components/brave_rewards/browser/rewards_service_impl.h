@@ -53,7 +53,6 @@ class SequencedTaskRunner;
 
 namespace ledger {
 class Ledger;
-class LedgerDatabase;
 struct LedgerMediaPublisherInfo;
 }  // namespace ledger
 
@@ -651,10 +650,6 @@ class RewardsServiceImpl : public RewardsService,
 
   void ReconcileStampReset() override;
 
-  void RunDBTransaction(
-      ledger::type::DBTransactionPtr transaction,
-      ledger::client::RunDBTransactionCallback callback) override;
-
   void GetCreateScript(
       ledger::client::GetCreateScriptCallback callback) override;
 
@@ -784,7 +779,6 @@ class RewardsServiceImpl : public RewardsService,
   const base::FilePath publisher_list_path_;
 
   std::unique_ptr<DiagnosticLog> diagnostic_log_;
-  std::unique_ptr<ledger::LedgerDatabase> ledger_database_;
   std::unique_ptr<RewardsNotificationServiceImpl> notification_service_;
   base::ObserverList<RewardsServicePrivateObserver> private_observers_;
   std::unique_ptr<RewardsServiceObserver> extension_observer_;

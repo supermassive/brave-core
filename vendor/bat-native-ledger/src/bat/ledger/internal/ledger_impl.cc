@@ -159,7 +159,8 @@ void LedgerImpl::InitializeDatabase(ResultCallback callback) {
       _1,
       finish_callback);
 
-  database()->Initialize(options_->execute_create_script, database_callback);
+  database()->Initialize(options_->database_path,
+                         options_->execute_create_script, database_callback);
 }
 
 void LedgerImpl::OnInitialized(type::Result result, ResultCallback callback) {

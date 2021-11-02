@@ -140,10 +140,6 @@ class LEDGER_EXPORT LedgerClient {
 
   virtual void ReconcileStampReset() = 0;
 
-  virtual void RunDBTransaction(
-      type::DBTransactionPtr transaction,
-      client::RunDBTransactionCallback callback) = 0;
-
   virtual void GetCreateScript(client::GetCreateScriptCallback callback) = 0;
 
   virtual void PendingContributionSaved(const type::Result result) = 0;

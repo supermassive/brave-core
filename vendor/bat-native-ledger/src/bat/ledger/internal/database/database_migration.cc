@@ -160,7 +160,7 @@ void DatabaseMigration::Start(
       start_version,
       migrated_version);
 
-  ledger_->ledger_client()->RunDBTransaction(
+  ledger_->database()->RunDBTransaction(
       std::move(transaction),
       [this, callback, message](type::DBCommandResponsePtr response) {
         if (response &&

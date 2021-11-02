@@ -3,10 +3,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+#include "bat/ledger/internal/database/database.h"
+
 #include <utility>
 
-#include "bat/ledger/internal/database/database.h"
+#include "base/threading/sequenced_task_runner_handle.h"
+
 #include "bat/ledger/internal/database/database_util.h"
+#include "bat/ledger/internal/ledger_database_impl.h"
 #include "bat/ledger/internal/ledger_impl.h"
 #include "bat/ledger/internal/logging/event_log_keys.h"
 
@@ -47,10 +51,29 @@ Database::Database(LedgerImpl* ledger) :
 
 Database::~Database() = default;
 
-void Database::Initialize(
-    const bool execute_create_script,
-    ledger::ResultCallback callback) {
+void Database::Initialize(const base::FilePath& database_path,
+                          const bool execute_create_script,
+                          ledger::ResultCallback callback) {
+  ledger_database_.reset(new LedgerDatabaseImpl(database_path));
   initialize_->Start(execute_create_script, callback);
+}
+
+void Database::RunDBTransaction(mojom::DBTransactionPtr transaction,
+                                client::RunDBTransactionCallback callback) {
+  DCHECK(ledger_database_);
+  auto response = mojom::DBCommandResponse::New();
+  ledger_database_->RunTransaction(std::move(transaction), response.get());
+  base::SequencedTaskRunnerHandle::Get()->PostTask(
+      FROM_HERE,
+      base::BindOnce(&Database::PostDatabaseResponse,
+                     weak_factory_.GetWeakPtr(), std::move(response),
+                     std::move(callback)));
+}
+
+void Database::PostDatabaseResponse(mojom::DBCommandResponsePtr response,
+                                    client::RunDBTransactionCallback callback) {
+  DCHECK(response);
+  callback(std::move(response));
 }
 
 void Database::Close(ledger::ResultCallback callback) {
@@ -63,9 +86,7 @@ void Database::Close(ledger::ResultCallback callback) {
       _1,
       callback);
 
-  ledger_->ledger_client()->RunDBTransaction(
-      std::move(transaction),
-      transaction_callback);
+  RunDBTransaction(std::move(transaction), transaction_callback);
 }
 
 /**

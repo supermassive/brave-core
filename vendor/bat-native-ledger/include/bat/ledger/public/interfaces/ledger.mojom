@@ -4,8 +4,11 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 module ledger.mojom;
 
+import "mojo/public/mojom/base/file_path.mojom";
+
 struct LedgerOptions {
   bool execute_create_script;
+  mojo_base.mojom.FilePath database_path;
 };
 
 enum ContributionStep {
