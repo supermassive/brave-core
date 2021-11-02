@@ -125,7 +125,8 @@ class LEDGER_EXPORT Ledger {
 
   static Ledger* CreateInstance(LedgerClient* client);
 
-  virtual void Initialize(bool execute_create_script, ResultCallback) = 0;
+  virtual void Initialize(mojom::LedgerOptionsPtr options,
+                          ResultCallback callback) = 0;
 
   virtual void CreateWallet(ResultCallback callback) = 0;
 

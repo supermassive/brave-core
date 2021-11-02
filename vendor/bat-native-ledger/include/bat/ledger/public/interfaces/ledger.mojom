@@ -4,6 +4,10 @@
 // file, You can obtain one at http://mozilla.org/MPL/2.0/.
 module ledger.mojom;
 
+struct LedgerOptions {
+  bool execute_create_script;
+};
+
 enum ContributionStep {
   STEP_RETRY_COUNT = -7,
   STEP_AC_OFF = -6,
@@ -240,7 +244,7 @@ enum Result {
   IN_PROGRESS= 33,
   REWARDS_OFF = 34,
   AC_OFF = 35,
-  
+
   DEVICE_LIMIT_REACHED = 36,
   MISMATCHED_PROVIDER_ACCOUNTS = 37,
   UPHOLD_BLOCKED_USER = 38,

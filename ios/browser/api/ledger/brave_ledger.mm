@@ -268,9 +268,12 @@ ledger::type::DBCommandResponsePtr RunDBTransactionOnTaskRunner(
   }
   self.initializing = YES;
 
+  auto options = ledger::mojom::LedgerOptions::New();
+  options->execute_create_script = executeMigrateScript;
+
   BLOG(3, @"DB: Migrate from CoreData? %@",
        (executeMigrateScript ? @"YES" : @"NO"));
-  ledger->Initialize(executeMigrateScript, ^(ledger::type::Result result) {
+  ledger->Initialize(std::move(options), ^(ledger::type::Result result) {
     self.initialized = (result == ledger::type::Result::LEDGER_OK ||
                         result == ledger::type::Result::NO_LEDGER_STATE ||
                         result == ledger::type::Result::NO_PUBLISHER_STATE);

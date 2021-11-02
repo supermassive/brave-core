@@ -34,9 +34,9 @@ class BatLedgerImpl :
   BatLedgerImpl& operator=(const BatLedgerImpl&) = delete;
 
   // bat_ledger::mojom::BatLedger
-  void Initialize(
-    const bool execute_create_script,
-    InitializeCallback callback) override;
+  void Initialize(ledger::mojom::LedgerOptionsPtr options,
+                  InitializeCallback callback) override;
+
   void CreateWallet(CreateWalletCallback callback) override;
   void GetRewardsParameters(GetRewardsParametersCallback callback) override;
 

@@ -134,7 +134,7 @@ void LedgerImpl::StartServices() {
   recovery_->Check();
 }
 
-void LedgerImpl::Initialize(bool execute_create_script,
+void LedgerImpl::Initialize(mojom::LedgerOptionsPtr options,
                             ResultCallback callback) {
   if (ready_state_ != ReadyState::kUninitialized) {
     BLOG(0, "Ledger already initializing");
@@ -143,12 +143,13 @@ void LedgerImpl::Initialize(bool execute_create_script,
   }
 
   ready_state_ = ReadyState::kInitializing;
-  InitializeDatabase(execute_create_script, callback);
+  options_ = std::move(options);
+  InitializeDatabase(callback);
 }
 
-void LedgerImpl::InitializeDatabase(bool execute_create_script,
-                                    ResultCallback callback) {
+void LedgerImpl::InitializeDatabase(ResultCallback callback) {
   DCHECK(ready_state_ == ReadyState::kInitializing);
+  DCHECK(options_);
 
   ResultCallback finish_callback =
       std::bind(&LedgerImpl::OnInitialized, this, _1, std::move(callback));
@@ -157,7 +158,8 @@ void LedgerImpl::InitializeDatabase(bool execute_create_script,
       this,
       _1,
       finish_callback);
-  database()->Initialize(execute_create_script, database_callback);
+
+  database()->Initialize(options_->execute_create_script, database_callback);
 }
 
 void LedgerImpl::OnInitialized(type::Result result, ResultCallback callback) {

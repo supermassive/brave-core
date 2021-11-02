@@ -87,7 +87,8 @@ class LedgerImpl : public Ledger {
 
   // Ledger Implementation
 
-  void Initialize(bool execute_create_script, ResultCallback callback) override;
+  void Initialize(mojom::LedgerOptionsPtr options,
+                  ResultCallback callback) override;
 
   void CreateWallet(ResultCallback callback) override;
 
@@ -326,7 +327,7 @@ class LedgerImpl : public Ledger {
 
   void OnStateInitialized(type::Result result, ResultCallback callback);
 
-  void InitializeDatabase(bool execute_create_script, ResultCallback callback);
+  void InitializeDatabase(ResultCallback callback);
 
   void OnDatabaseInitialized(type::Result result, ResultCallback callback);
 
@@ -358,6 +359,7 @@ class LedgerImpl : public Ledger {
   uint32_t last_shown_tab_id_ = -1;
   std::queue<std::function<void()>> ready_callbacks_;
   ReadyState ready_state_ = ReadyState::kUninitialized;
+  mojom::LedgerOptionsPtr options_;
 };
 
 }  // namespace ledger

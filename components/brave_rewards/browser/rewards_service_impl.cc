@@ -512,7 +512,7 @@ void RewardsServiceImpl::OnLedgerCreated() {
   PrepareLedgerEnvForTesting();
 
   bat_ledger_->Initialize(
-      false,
+      ledger::mojom::LedgerOptions::New(),
       base::BindOnce(&RewardsServiceImpl::OnLedgerInitialized, AsWeakPtr()));
 }
 
