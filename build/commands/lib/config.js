@@ -30,10 +30,11 @@ const run = (cmd, args = []) => {
 }
 
 // this is a huge hack because the npm config doesn't get passed through from brave-browser .npmrc/package.json
-var packageConfig = function (key) {
-  let packages = { config: {} }
-  if (fs.existsSync(path.join(rootDir, 'package.json'))) {
-    packages = require(path.relative(__dirname, path.join(rootDir, 'package.json')))
+var packageConfig = function(key, sourceDir = rootDir){
+  let packages = { config: {}}
+  const configAbsolutePath = path.join(sourceDir, 'package.json')
+  if (fs.existsSync(configAbsolutePath)) {
+    packages = require(path.relative(__dirname, configAbsolutePath))
   }
 
   // packages.config should include version string.
@@ -47,13 +48,17 @@ var packageConfig = function (key) {
   return obj
 }
 
-const getNPMConfig = (key) => {
+var packageConfigBraveCore = function(key) {
+  return packageConfig(key, path.join(rootDir, 'src', 'brave'))
+}
+
+const getNPMConfig = (key, fallbackToBraveCoreOnly) => {
   if (!NpmConfig) {
     const list = run(npmCommand, ['config', 'list', '--json', '--userconfig=' + path.join(rootDir, '.npmrc')])
     NpmConfig = JSON.parse(list.stdout.toString())
   }
 
-  return NpmConfig[key.join('-').replace(/_/g, '-')] || packageConfig(key)
+  return NpmConfig[key.join('-').replace(/_/g, '-')] || packageConfig(key) || packageConfigBraveCore(key)
 }
 
 const parseExtraInputs = (inputs, accumulator, callback) => {
@@ -88,8 +93,9 @@ const Config = function () {
   this.defaultGClientFile = path.join(this.rootDir, '.gclient')
   this.gClientFile = process.env.BRAVE_GCLIENT_FILE || this.defaultGClientFile
   this.gClientVerbose = getNPMConfig(['gclient_verbose']) || false
-  this.targetArch = getNPMConfig(['target_arch']) || 'x64'
+  this.targetArch = getNPMConfig(['target_arch']) || process.arch
   this.targetOS = getNPMConfig(['target_os'])
+  this.targetEnvironment = getNPMConfig(['target_environment'])
   this.gypTargetArch = 'x64'
   this.targetAndroidBase = 'classic'
   this.braveGoogleApiKey = getNPMConfig(['brave_google_api_key']) || 'AIzaSyAREPLACEWITHYOUROWNGOOGLEAPIKEY2Q'
@@ -417,6 +423,9 @@ Config.prototype.buildArgs = function () {
 
   if (this.targetOS === 'ios') {
     args.target_os = 'ios'
+    if (this.targetEnvironment) {
+      args.target_environment = this.targetEnvironment
+    }
     args.enable_dsyms = true
     args.enable_stripping = !this.isDebug()
     args.use_xcode_clang = false
@@ -598,6 +607,10 @@ Config.prototype.update = function (options) {
 
   if (options.target_os) {
     this.targetOS = options.target_os
+  }
+
+  if (options.target_environment) {
+    this.targetEnvironment = options.target_environment
   }
 
   if (options.is_asan) {
@@ -914,6 +927,9 @@ Object.defineProperty(Config.prototype, 'outputDir', {
     }
     if (this.targetOS) {
       buildConfigDir = this.targetOS + "_" + buildConfigDir
+    }
+    if (this.targetEnvironment) {
+      buildConfigDir = buildConfigDir  + "_" + this.targetEnvironment
     }
 
     return path.join(baseDir, buildConfigDir)
