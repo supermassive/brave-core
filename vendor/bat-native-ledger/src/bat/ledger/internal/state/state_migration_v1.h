@@ -35,12 +35,6 @@ class StateMigrationV1 {
       const type::Result result,
       ledger::ResultCallback callback);
 
-  void SaveProcessedPublishers(ledger::ResultCallback callback);
-
-  void ProcessedPublisherSaved(
-      const type::Result result,
-      ledger::ResultCallback callback);
-
   std::unique_ptr<publisher::LegacyPublisherState> legacy_publisher_;
   LedgerImpl* ledger_;  // NOT OWNED
   bool legacy_data_migrated_ = false;

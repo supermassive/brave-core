@@ -39,9 +39,6 @@ class ContributionExternalWallet {
       const type::Result result,
       const std::string& contribution_id);
 
-  void OnSavePendingContribution(
-      const type::Result result);
-
   void OnServerPublisherInfo(type::ServerPublisherInfoPtr info,
                              const std::string& contribution_id,
                              const double amount,

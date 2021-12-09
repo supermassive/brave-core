@@ -3,11 +3,12 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef BRAVELEDGER_CONTRIBUTION_CONTRIBUTION_TIP_H_
-#define BRAVELEDGER_CONTRIBUTION_CONTRIBUTION_TIP_H_
+#ifndef BRAVE_VENDOR_BAT_NATIVE_LEDGER_SRC_BAT_LEDGER_INTERNAL_CONTRIBUTION_CONTRIBUTION_TIP_H_
+#define BRAVE_VENDOR_BAT_NATIVE_LEDGER_SRC_BAT_LEDGER_INTERNAL_CONTRIBUTION_CONTRIBUTION_TIP_H_
 
 #include <string>
 
+#include "bat/ledger/internal/core/callback_adapter.h"
 #include "bat/ledger/ledger.h"
 
 namespace ledger {
@@ -37,18 +38,11 @@ class ContributionTip {
       const type::Result result,
       ledger::ResultCallback callback);
 
-  void SavePending(
-      const std::string& publisher_key,
-      const double amount,
-      ledger::ResultCallback callback);
-
-  void OnSavePending(
-      const type::Result result,
-      ledger::ResultCallback callback);
-
   LedgerImpl* ledger_;  // NOT OWNED
+  CallbackAdapter callback_adapter_;
 };
 
 }  // namespace contribution
 }  // namespace ledger
-#endif  // BRAVELEDGER_CONTRIBUTION_CONTRIBUTION_TIP_H_
+
+#endif  // BRAVE_VENDOR_BAT_NATIVE_LEDGER_SRC_BAT_LEDGER_INTERNAL_CONTRIBUTION_CONTRIBUTION_TIP_H_

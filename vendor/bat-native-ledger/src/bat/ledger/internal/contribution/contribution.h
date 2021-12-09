@@ -3,8 +3,8 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
-#ifndef BRAVELEDGER_CONTRIBUTION_CONTRIBUTION_H_
-#define BRAVELEDGER_CONTRIBUTION_CONTRIBUTION_H_
+#ifndef BRAVE_VENDOR_BAT_NATIVE_LEDGER_SRC_BAT_LEDGER_INTERNAL_CONTRIBUTION_CONTRIBUTION_H_
+#define BRAVE_VENDOR_BAT_NATIVE_LEDGER_SRC_BAT_LEDGER_INTERNAL_CONTRIBUTION_CONTRIBUTION_H_
 
 #include <stdint.h>
 
@@ -22,7 +22,6 @@
 #include "bat/ledger/internal/contribution/contribution_sku.h"
 #include "bat/ledger/internal/contribution/contribution_tip.h"
 #include "bat/ledger/internal/contribution/contribution_unblinded.h"
-#include "bat/ledger/internal/contribution/unverified.h"
 #include "bat/ledger/ledger.h"
 
 namespace ledger {
@@ -172,7 +171,6 @@ class Contribution {
       const std::string& contribution_id);
 
   LedgerImpl* ledger_;  // NOT OWNED
-  std::unique_ptr<Unverified> unverified_;
   std::unique_ptr<Unblinded> unblinded_;
   std::unique_ptr<ContributionSKU> sku_;
   std::unique_ptr<ContributionMonthly> monthly_;
@@ -188,4 +186,5 @@ class Contribution {
 
 }  // namespace contribution
 }  // namespace ledger
-#endif  // BRAVELEDGER_CONTRIBUTION_CONTRIBUTION_H_
+
+#endif  // BRAVE_VENDOR_BAT_NATIVE_LEDGER_SRC_BAT_LEDGER_INTERNAL_CONTRIBUTION_CONTRIBUTION_H_

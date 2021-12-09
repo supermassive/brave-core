@@ -16,6 +16,7 @@
 #include "bat/ledger/internal/common/time_util.h"
 #include "bat/ledger/internal/contribution/contribution.h"
 #include "bat/ledger/internal/contribution/contribution_util.h"
+#include "bat/ledger/internal/contribution/pending_contribution_manager.h"
 #include "bat/ledger/internal/ledger_impl.h"
 #include "bat/ledger/internal/publisher/publisher_status_helper.h"
 #include "bat/ledger/internal/wallet/wallet_balance.h"
@@ -58,15 +59,14 @@ ledger::type::ContributionStep ConvertResultIntoContributionStep(
 namespace ledger {
 namespace contribution {
 
-Contribution::Contribution(LedgerImpl* ledger) :
-    ledger_(ledger),
-    unverified_(std::make_unique<Unverified>(ledger)),
-    unblinded_(std::make_unique<Unblinded>(ledger)),
-    sku_(std::make_unique<ContributionSKU>(ledger)),
-    monthly_(std::make_unique<ContributionMonthly>(ledger)),
-    ac_(std::make_unique<ContributionAC>(ledger)),
-    tip_(std::make_unique<ContributionTip>(ledger)),
-    anon_card_(std::make_unique<ContributionAnonCard>(ledger)) {
+Contribution::Contribution(LedgerImpl* ledger)
+    : ledger_(ledger),
+      unblinded_(std::make_unique<Unblinded>(ledger)),
+      sku_(std::make_unique<ContributionSKU>(ledger)),
+      monthly_(std::make_unique<ContributionMonthly>(ledger)),
+      ac_(std::make_unique<ContributionAC>(ledger)),
+      tip_(std::make_unique<ContributionTip>(ledger)),
+      anon_card_(std::make_unique<ContributionAnonCard>(ledger)) {
   DCHECK(ledger_);
   external_wallet_ = std::make_unique<ContributionExternalWallet>(ledger);
 }
@@ -267,7 +267,9 @@ void Contribution::ContributionCompletedSaved(
 }
 
 void Contribution::ContributeUnverifiedPublishers() {
-  unverified_->Contribute();
+  ledger_->context()
+      .Get<PendingContributionManager>()
+      .ProcessPendingContributions();
 }
 
 void Contribution::OneTimeTip(

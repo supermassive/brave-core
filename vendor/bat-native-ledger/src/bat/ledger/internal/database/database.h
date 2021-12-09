@@ -22,8 +22,6 @@
 #include "bat/ledger/internal/database/database_initialize.h"
 #include "bat/ledger/internal/database/database_media_publisher_info.h"
 #include "bat/ledger/internal/database/database_multi_tables.h"
-#include "bat/ledger/internal/database/database_pending_contribution.h"
-#include "bat/ledger/internal/database/database_processed_publisher.h"
 #include "bat/ledger/internal/database/database_promotion.h"
 #include "bat/ledger/internal/database/database_publisher_info.h"
 #include "bat/ledger/internal/database/database_publisher_prefix_list.h"
@@ -224,39 +222,6 @@ class Database {
       ledger::GetTransactionReportCallback callback);
 
   /**
-   * PENDING CONTRIBUTION
-   */
-  void SavePendingContribution(
-      type::PendingContributionList list,
-      ledger::ResultCallback callback);
-
-  void GetPendingContributionsTotal(
-      ledger::PendingContributionsTotalCallback callback);
-
-  void GetPendingContributions(
-      ledger::PendingContributionInfoListCallback callback);
-
-  void GetUnverifiedPublishersForPendingContributions(
-      ledger::UnverifiedPublishersCallback callback);
-
-  void RemovePendingContribution(
-      const uint64_t id,
-      ledger::ResultCallback callback);
-
-  void RemoveAllPendingContributions(ledger::ResultCallback callback);
-
-  /**
-   * PROCESSED PUBLISHER
-   */
-  void SaveProcessedPublisherList(
-      const std::vector<std::string>& list,
-      ledger::ResultCallback callback);
-
-  void WasPublisherProcessed(
-      const std::string& publisher_key,
-      ledger::ResultCallback callback);
-
-  /**
    * PROMOTION
    */
   virtual void SavePromotion(
@@ -436,8 +401,6 @@ class Database {
   std::unique_ptr<DatabaseContributionQueue> contribution_queue_;
   std::unique_ptr<DatabaseCredsBatch> creds_batch_;
   std::unique_ptr<DatabaseEventLog> event_log_;
-  std::unique_ptr<DatabasePendingContribution> pending_contribution_;
-  std::unique_ptr<DatabaseProcessedPublisher> processed_publisher_;
   std::unique_ptr<DatabasePromotion> promotion_;
   std::unique_ptr<DatabaseMediaPublisherInfo> media_publisher_info_;
   std::unique_ptr<DatabaseMultiTables> multi_tables_;

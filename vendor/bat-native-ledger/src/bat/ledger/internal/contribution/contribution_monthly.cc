@@ -3,11 +3,14 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+#include "bat/ledger/internal/contribution/contribution_monthly.h"
+
 #include <utility>
+#include <vector>
 
 #include "base/guid.h"
-#include "bat/ledger/internal/contribution/contribution_monthly.h"
 #include "bat/ledger/internal/contribution/contribution_monthly_util.h"
+#include "bat/ledger/internal/contribution/pending_contribution_manager.h"
 #include "bat/ledger/internal/ledger_impl.h"
 
 using std::placeholders::_1;
@@ -69,7 +72,7 @@ void ContributionMonthly::GetVerifiedTipList(
     const type::PublisherInfoList& list,
     type::PublisherInfoList* verified_list) {
   DCHECK(verified_list);
-  type::PendingContributionList non_verified;
+  std::vector<PendingContributionManager::AddInfo> pending_list;
 
   for (const auto& publisher : list) {
     if (!publisher || publisher->id.empty() || publisher->weight == 0.0) {
@@ -81,35 +84,18 @@ void ContributionMonthly::GetVerifiedTipList(
       continue;
     }
 
-    auto contribution = type::PendingContribution::New();
-    contribution->amount = publisher->weight;
-    contribution->publisher_key = publisher->id;
-    contribution->viewing_id = "";
-    contribution->type = type::RewardsType::RECURRING_TIP;
-
-    non_verified.push_back(std::move(contribution));
+    pending_list.push_back(PendingContributionManager::AddInfo{
+        .type = PendingContributionType::kRecurring,
+        .publisher_key = publisher->id,
+        .amount = publisher->weight});
   }
 
-  if (non_verified.empty()) {
+  if (pending_list.empty()) {
     return;
   }
 
-  auto save_callback = std::bind(
-      &ContributionMonthly::OnSavePendingContribution,
-      this,
-      _1);
-  ledger_->database()->SavePendingContribution(
-      std::move(non_verified),
-      save_callback);
-}
-
-void ContributionMonthly::OnSavePendingContribution(
-    const type::Result result) {
-  if (result != type::Result::LEDGER_OK) {
-    BLOG(0, "Problem saving pending");
-  }
-
-  ledger_->ledger_client()->PendingContributionSaved(result);
+  ledger_->context().Get<PendingContributionManager>().AddPendingContributions(
+      pending_list);
 }
 
 void ContributionMonthly::HasSufficientBalance(

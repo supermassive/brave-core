@@ -5,8 +5,10 @@
 
 #include <utility>
 
-#include "base/guid.h"
 #include "bat/ledger/internal/contribution/contribution_tip.h"
+
+#include "base/guid.h"
+#include "bat/ledger/internal/contribution/pending_contribution_manager.h"
 #include "bat/ledger/internal/ledger_impl.h"
 
 using std::placeholders::_1;
@@ -56,16 +58,13 @@ void ContributionTip::ServerPublisher(
 
   // Save to the pending list if not verified
   if (status == type::PublisherStatus::NOT_VERIFIED) {
-    BLOG(1, "Saving pending publisher " << publisher_key);
-    auto save_callback = std::bind(&ContributionTip::OnSavePending,
-        this,
-        _1,
-        callback);
-
-    SavePending(
-        publisher_key,
-        amount,
-        save_callback);
+    ledger_->context()
+        .Get<PendingContributionManager>()
+        .AddPendingContribution(PendingContributionType::kOneTime,
+                                publisher_key, amount)
+        .Then(callback_adapter_([callback](bool success) {
+          callback(CallbackAdapter::ResultCode(success));
+        }));
     return;
   }
 
@@ -100,33 +99,6 @@ void ContributionTip::QueueSaved(
   }
 
   callback(type::Result::LEDGER_OK);
-}
-
-void ContributionTip::SavePending(
-    const std::string& publisher_key,
-    const double amount,
-    ledger::ResultCallback callback) {
-  auto contribution = type::PendingContribution::New();
-  contribution->publisher_key = publisher_key;
-  contribution->amount = amount;
-  contribution->type = type::RewardsType::ONE_TIME_TIP;
-
-  type::PendingContributionList list;
-  list.push_back(std::move(contribution));
-
-  ledger_->database()->SavePendingContribution(std::move(list), callback);
-}
-
-void ContributionTip::OnSavePending(
-    const type::Result result,
-    ledger::ResultCallback callback) {
-  if (result != type::Result::LEDGER_OK) {
-    BLOG(0, "Pending tip save failed");
-  } else {
-    ledger_->ledger_client()->PendingContributionSaved(result);
-  }
-
-  callback(result);
 }
 
 }  // namespace contribution

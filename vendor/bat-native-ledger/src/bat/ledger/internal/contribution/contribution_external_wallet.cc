@@ -3,11 +3,13 @@
  * License, v. 2.0. If a copy of the MPL was not distributed with this
  * file, You can obtain one at http://mozilla.org/MPL/2.0/. */
 
+#include "bat/ledger/internal/contribution/contribution_external_wallet.h"
+
 #include <utility>
 
 #include "bat/ledger/global_constants.h"
 #include "bat/ledger/internal/bitflyer/bitflyer_util.h"
-#include "bat/ledger/internal/contribution/contribution_external_wallet.h"
+#include "bat/ledger/internal/contribution/pending_contribution_manager.h"
 #include "bat/ledger/internal/ledger_impl.h"
 #include "bat/ledger/internal/uphold/uphold_util.h"
 
@@ -107,14 +109,6 @@ void ContributionExternalWallet::ContributionInfo(
   callback(type::Result::LEDGER_OK);
 }
 
-void ContributionExternalWallet::OnSavePendingContribution(
-    const type::Result result) {
-  if (result != type::Result::LEDGER_OK) {
-    BLOG(0, "Problem saving pending");
-  }
-  ledger_->ledger_client()->PendingContributionSaved(result);
-}
-
 void ContributionExternalWallet::OnServerPublisherInfo(
     type::ServerPublisherInfoPtr info,
     const std::string& contribution_id,
@@ -154,32 +148,13 @@ void ContributionExternalWallet::OnServerPublisherInfo(
 
     BLOG(1, "Publisher not verified");
 
-    // TODO(zenparsing): Adding a record to the pending contribution table at
-    // this point can lead to an (async) infinite loop if pending contributions
-    // are currently being flushed. In `unverified.cc`, the pending contribution
-    // processor processes the first available pending record and then sets a
-    // timer to process the next one. If another record is added before that
-    // timer expires, it can cause the flushing operation to continue
-    // indefinitely.
+    PendingContributionType pending_type =
+        type == type::RewardsType::ONE_TIME_TIP
+            ? PendingContributionType::kOneTime
+            : PendingContributionType::kRecurring;
 
-    /*
-    auto save_callback =
-        std::bind(&ContributionExternalWallet::OnSavePendingContribution,
-            this,
-            _1);
-
-    auto contribution = type::PendingContribution::New();
-    contribution->publisher_key = info->publisher_key;
-    contribution->amount = amount;
-    contribution->type = type;
-
-    type::PendingContributionList list;
-    list.push_back(std::move(contribution));
-
-    ledger_->database()->SavePendingContribution(
-        std::move(list),
-        save_callback);
-    */
+    ledger_->context().Get<PendingContributionManager>().AddPendingContribution(
+        pending_type, info->publisher_key, amount);
 
     callback(type::Result::LEDGER_ERROR);
     return;

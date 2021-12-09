@@ -10,6 +10,7 @@
 #include "bat/ledger/internal/common/security_util.h"
 #include "bat/ledger/internal/common/time_util.h"
 #include "bat/ledger/internal/constants.h"
+#include "bat/ledger/internal/contribution/pending_contribution_manager.h"
 #include "bat/ledger/internal/core/bat_ledger_context.h"
 #include "bat/ledger/internal/ledger_impl.h"
 #include "bat/ledger/internal/legacy/media/helper.h"
@@ -701,32 +702,71 @@ std::string LedgerImpl::GetShareURL(
 void LedgerImpl::GetPendingContributions(
     PendingContributionInfoListCallback callback) {
   WhenReady([this, callback]() {
-    database()->GetPendingContributions(
-        [this, callback](type::PendingContributionInfoList list) {
-          // The publisher status field may be expired. Attempt to refresh
-          // expired publisher status values before executing callback.
-          publisher::RefreshPublisherStatus(this, std::move(list), callback);
-        });
+    context()
+        .Get<PendingContributionManager>()
+        .GetPendingContributions()
+        .Map(base::BindOnce(
+            [](std::vector<PendingContributionManager::PendingInfo> list) {
+              std::vector<mojom::PendingContributionInfoPtr> result;
+              for (auto& pending : list) {
+                auto info = mojom::PendingContributionInfo::New();
+                info->id = pending.id;
+                info->publisher_key = pending.publisher_key;
+                info->type = pending.type == PendingContributionType::kOneTime
+                                 ? mojom::RewardsType::ONE_TIME_TIP
+                                 : mojom::RewardsType::RECURRING_TIP;
+                info->status = pending.publisher_verified
+                                   ? mojom::PublisherStatus::CONNECTED
+                                   : mojom::PublisherStatus::NOT_VERIFIED;
+                info->name = pending.publisher_name;
+                info->provider = "";  // TODO(zenparsing)
+                info->url = pending.publisher_url;
+                info->amount = pending.amount;
+                info->expiration_date =
+                    static_cast<uint64_t>(pending.expires_at.ToDoubleT());
+
+                result.push_back(std::move(info));
+              }
+              return result;
+            }))
+        .Then(callback_adapter_(
+            [callback](std::vector<mojom::PendingContributionInfoPtr> list) {
+              callback(std::move(list));
+            }));
   });
 }
 
 void LedgerImpl::RemovePendingContribution(uint64_t id,
                                            ResultCallback callback) {
   WhenReady([this, id, callback]() {
-    database()->RemovePendingContribution(id, callback);
+    context()
+        .Get<PendingContributionManager>()
+        .DeletePendingContribution(id)
+        .Then(callback_adapter_([callback](bool success) {
+          callback(CallbackAdapter::ResultCode(success));
+        }));
   });
 }
 
 void LedgerImpl::RemoveAllPendingContributions(ResultCallback callback) {
   WhenReady([this, callback]() {
-    database()->RemoveAllPendingContributions(callback);
+    context()
+        .Get<PendingContributionManager>()
+        .ClearPendingContributions()
+        .Then(callback_adapter_([callback](bool success) {
+          callback(CallbackAdapter::ResultCode(success));
+        }));
   });
 }
 
 void LedgerImpl::GetPendingContributionsTotal(
     PendingContributionsTotalCallback callback) {
   WhenReady([this, callback]() {
-    database()->GetPendingContributionsTotal(callback);
+    context()
+        .Get<PendingContributionManager>()
+        .GetPendingContributionsTotal()
+        .Then(
+            callback_adapter_([callback](double amount) { callback(amount); }));
   });
 }
 

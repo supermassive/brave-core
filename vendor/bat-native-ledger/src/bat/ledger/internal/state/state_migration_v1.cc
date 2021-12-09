@@ -89,7 +89,10 @@ void StateMigrationV1::OnLoadState(
     return;
   }
 
-  SaveProcessedPublishers(callback);
+  // TODO(zenparsing): We've removed the import of "processed_publishers" for
+  // simplicity. Is that acceptable?
+
+  callback(type::Result::LEDGER_OK);
 }
 
 void StateMigrationV1::BalanceReportsSaved(
@@ -97,30 +100,6 @@ void StateMigrationV1::BalanceReportsSaved(
     ledger::ResultCallback callback) {
   if (result != type::Result::LEDGER_OK) {
     BLOG(0, "Balance report save failed");
-    callback(result);
-    return;
-  }
-
-  SaveProcessedPublishers(callback);
-}
-
-void StateMigrationV1::SaveProcessedPublishers(
-    ledger::ResultCallback callback) {
-  auto save_callback = std::bind(&StateMigrationV1::ProcessedPublisherSaved,
-    this,
-    _1,
-    callback);
-
-  ledger_->database()->SaveProcessedPublisherList(
-      legacy_publisher_->GetAlreadyProcessedPublishers(),
-      save_callback);
-}
-
-void StateMigrationV1::ProcessedPublisherSaved(
-    const type::Result result,
-    ledger::ResultCallback callback) {
-  if (result != type::Result::LEDGER_OK) {
-    BLOG(0, "Processed publisher save failed");
     callback(result);
     return;
   }

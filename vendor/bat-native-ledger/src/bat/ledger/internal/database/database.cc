@@ -29,9 +29,6 @@ Database::Database(LedgerImpl* ledger) :
   media_publisher_info_ =
       std::make_unique<DatabaseMediaPublisherInfo>(ledger_);
   multi_tables_ = std::make_unique<DatabaseMultiTables>(ledger_);
-  pending_contribution_ =
-      std::make_unique<DatabasePendingContribution>(ledger_);
-  processed_publisher_ = std::make_unique<DatabaseProcessedPublisher>(ledger_);
   promotion_ = std::make_unique<DatabasePromotion>(ledger_);
   publisher_info_ = std::make_unique<DatabasePublisherInfo>(ledger_);
   publisher_prefix_list_ =
@@ -328,55 +325,6 @@ void Database::GetTransactionReport(
     const int year,
     ledger::GetTransactionReportCallback callback) {
   multi_tables_->GetTransactionReport(month, year, callback);
-}
-
-/**
- * PENDING CONTRIBUTION
- */
-void Database::SavePendingContribution(
-    type::PendingContributionList list,
-    ledger::ResultCallback callback) {
-  pending_contribution_->InsertOrUpdateList(std::move(list), callback);
-}
-
-void Database::GetPendingContributionsTotal(
-    ledger::PendingContributionsTotalCallback callback) {
-  pending_contribution_->GetReservedAmount(callback);
-}
-
-void Database::GetPendingContributions(
-    ledger::PendingContributionInfoListCallback callback) {
-  pending_contribution_->GetAllRecords(callback);
-}
-
-void Database::GetUnverifiedPublishersForPendingContributions(
-    ledger::UnverifiedPublishersCallback callback) {
-  pending_contribution_->GetUnverifiedPublishers(std::move(callback));
-}
-
-void Database::RemovePendingContribution(
-    const uint64_t id,
-    ledger::ResultCallback callback) {
-  pending_contribution_->DeleteRecord(id, callback);
-}
-
-void Database::RemoveAllPendingContributions(ledger::ResultCallback callback) {
-  pending_contribution_->DeleteAllRecords(callback);
-}
-
-/**
- * PROCESSED PUBLISHER
- */
-void Database::SaveProcessedPublisherList(
-    const std::vector<std::string>& list,
-    ledger::ResultCallback callback) {
-  processed_publisher_->InsertOrUpdateList(list, callback);
-}
-
-void Database::WasPublisherProcessed(
-    const std::string& publisher_key,
-    ledger::ResultCallback callback) {
-  processed_publisher_->WasProcessed(publisher_key, callback);
 }
 
 /**
