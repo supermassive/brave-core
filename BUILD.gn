@@ -185,7 +185,9 @@ group("create_dist") {
   if (is_android) {
     deps += [ "build/android:sign_app" ]
   } else {
-    deps += [ ":create_symbols_dist" ]
+    if (brave_debug_symbol_level != 0) {
+      deps += [ ":create_symbols_dist" ]
+    }
   }
 
   # for linux zip will be created along with installer
@@ -339,6 +341,9 @@ action("create_symbols_dist") {
 
   inputs = get_target_outputs(":brave_license_dist_resources")
   dir_inputs = [ "$brave_product_name.breakpad.syms" ]
+  if (brave_debug_symbol_level == 2) {
+    dir_inputs += [ "$brave_product_name.pdb.syms" ]
+  }
 
   file_inputs = []
   foreach(input, inputs) {

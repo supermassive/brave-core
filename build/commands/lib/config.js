@@ -298,11 +298,17 @@ Config.prototype.buildArgs = function () {
     sparkle_dsa_private_key_file: this.sparkleDSAPrivateKeyFile,
     sparkle_eddsa_private_key: this.sparkleEdDSAPrivateKey,
     sparkle_eddsa_public_key: this.sparkleEdDSAPublicKey,
+    is_brave_release_build: this.isBraveReleaseBuild(),
     ...this.extraGnArgs,
   }
 
   if (!this.isBraveReleaseBuild()) {
     args.chrome_pgo_phase = 0
+  }
+
+  if (this.braveDebugSymbolLevel !== undefined) {
+    console.log('set brave_debug_symbol_level', this.braveDebugSymbolLevel)
+    args.brave_debug_symbol_level = this.braveDebugSymbolLevel;
   }
 
   if (this.shouldSign()) {
@@ -655,6 +661,10 @@ Config.prototype.update = function (options) {
 
   if (options.brave_safetynet_api_key) {
     this.braveSafetyNetApiKey = options.brave_safetynet_api_key
+  }
+
+  if (options.brave_debug_symbol_level !== undefined) {
+    this.braveDebugSymbolLevel = options.brave_debug_symbol_level
   }
 
   if (options.brave_google_api_endpoint) {

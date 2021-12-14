@@ -32,12 +32,22 @@ declare_args() {
   brave_android_keystore_name = ""
   brave_android_keystore_password = ""
   brave_android_key_password = ""
+  is_brave_release_build = false
 
   skip_signing = false
 
   # Used for generating delta installer on macOS/Windows
   build_delta_installer = false
   last_chrome_installer = ""
+}
+
+declare_args() {
+  if (is_brave_release_build) {
+    # Generate all symbols (breakpad + native) for
+    brave_debug_symbol_level = 2
+  } else {
+    brave_debug_symbol_level = 1
+  }
 }
 
 brave_version = "$brave_version_major.$brave_version_minor.$brave_version_build"

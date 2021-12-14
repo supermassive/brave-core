@@ -1,12 +1,15 @@
-import("//build/util/branding.gni")
 import("//brave/build/config.gni")
+import("//build/util/branding.gni")
 import("//media/cdm/library_cdm/cdm_paths.gni")
 
 action("generate_breakpad_symbols") {
   symbols_dir = "$brave_dist_dir/$brave_product_name.breakpad.syms"
-  outputs = [
-    symbols_dir
-  ]
+  outputs = [ symbols_dir ]
+
+  if (brave_debug_symbol_level == 2) {
+    platform_symbols_dir = "$brave_dist_dir/$brave_product_name.pdb.syms"
+    outputs += [ platform_symbols_dir ]
+  }
 
   # On both Windows x86 and x64 we will single thread
   # symbol generation due to Python's Global Interpreter
@@ -20,14 +23,18 @@ action("generate_breakpad_symbols") {
     "--build-dir=" + rebase_path(root_out_dir),
     "--verbose",
     "--clear",
-    rebase_path(root_out_dir)
+    rebase_path(root_out_dir),
   ]
 
-  script = "//brave/tools/win/generate_breakpad_symbols.py"
+  if (brave_debug_symbol_level == 2) {
+    args += [ "--platform-symbols-dir=" + rebase_path(platform_symbols_dir) ]
+  }
+
+  script = "//brave/tools/win/generate_debug_symbols.py"
 
   deps = [
-    "//third_party/breakpad:dump_syms",
     "//brave/build/win:copy_pdb",
+    "//third_party/breakpad:dump_syms",
   ]
 }
 
@@ -36,13 +43,9 @@ group("symbol_dist_resources") {
 }
 
 copy("dist_resources") {
-  sources = [
-    "$root_out_dir/chrome_elf.dll",
-  ]
+  sources = [ "$root_out_dir/chrome_elf.dll" ]
 
-  outputs = [
-    "$brave_dist_dir/{{source_file_part}}",
-  ]
+  outputs = [ "$brave_dist_dir/{{source_file_part}}" ]
 
   public_deps = [
     "//chrome/chrome_elf",
