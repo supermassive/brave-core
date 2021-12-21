@@ -46,6 +46,7 @@ class BraveFederatedService : public KeyedService {
   static void RegisterProfilePrefs(PrefRegistrySimple* registry);
 
   void Start();
+  DataStoreService* GetDataStoreService();
 
  private:
   void InitPrefChangeRegistrar();

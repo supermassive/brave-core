@@ -49,6 +49,10 @@ void BraveFederatedService::InitPrefChangeRegistrar() {
                           base::Unretained(this)));
 }
 
+DataStoreService* BraveFederatedService::GetDataStoreService() {
+  return data_store_service_.get();
+}
+
 void BraveFederatedService::Start() {
   base::FilePath db_path(
       browser_context_path_.AppendASCII("data_store.sqlite"));
