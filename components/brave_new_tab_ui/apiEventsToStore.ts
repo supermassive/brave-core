@@ -115,3 +115,6 @@ chrome.braveRewards.onPromotionFinish.addListener((result: number, promotion: Ne
 chrome.braveRewards.onCompleteReset.addListener((properties: { success: boolean }) => {
   getActions().onCompleteReset(properties.success)
 })
+
+let w = window as any
+w.wireApiEventsToStore = wireApiEventsToStore
