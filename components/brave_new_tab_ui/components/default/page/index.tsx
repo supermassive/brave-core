@@ -307,13 +307,6 @@ function getPageBackground (p: HasImageProps) {
       right: 0;
       display: block;
       transition: opacity .5s ease-in-out;
-      ${p => !p.hasImage && css`
-        background: linear-gradient(
-            to bottom right,
-            #4D54D1,
-            #A51C7B 50%,
-            #EE4A37 100%);
-      `};
       ${p => p.hasImage && p.imageSrc && css`
         opacity: var(--bg-opacity);
         background: linear-gradient(
@@ -332,7 +325,7 @@ function getPageBackground (p: HasImageProps) {
 }
 
 export const App = styled('div')<AppProps & HasImageProps>`
-  --bg-opacity: ${p => p.imageHasLoaded ? 1 : 0};
+  --bg-opacity: 1;
   position: relative;
   padding-top: var(--ntp-fixed-content-height, "0px");
   box-sizing: border-box;
@@ -340,7 +333,7 @@ export const App = styled('div')<AppProps & HasImageProps>`
   flex: 1;
   flex-direction: column;
   transition: opacity .125s ease-out;
-  opacity: ${p => p.dataIsReady ? 1 : 0};
+  opacity: 1;
   ${getPageBackground}
 `
 

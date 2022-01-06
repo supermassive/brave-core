@@ -115,3 +115,17 @@ chrome.braveRewards.onPromotionFinish.addListener((result: number, promotion: Ne
 chrome.braveRewards.onCompleteReset.addListener((properties: { success: boolean }) => {
   getActions().onCompleteReset(properties.success)
 })
+
+let w = window as any
+w.wireApiEventsToStore_ = function() {
+  getInitialData()
+  .then((initialData) => {
+    initialData.preferences.brandedWallpaperOptIn = false;
+    if (initialData.preferences.showRewards) {
+      rewardsInitData()
+    }
+    console.log(initialData)
+    getActions().setInitialData(initialData)
+  })
+  console.log(11);
+}

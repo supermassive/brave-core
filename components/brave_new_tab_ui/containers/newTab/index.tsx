@@ -83,6 +83,7 @@ interface State {
 function GetBackgroundImageSrc (props: Props) {
   if (!props.newTabData.showBackgroundImage &&
       (!props.newTabData.brandedWallpaper || props.newTabData.brandedWallpaper.isSponsored)) {
+    console.log("undefined")
     return undefined
   }
   if (props.newTabData.brandedWallpaper) {
@@ -94,6 +95,7 @@ function GetBackgroundImageSrc (props: Props) {
   if (props.newTabData.backgroundWallpaper && props.newTabData.backgroundWallpaper.wallpaperImageUrl) {
     return props.newTabData.backgroundWallpaper.wallpaperImageUrl
   }
+  console.log("undefined")
   return undefined
 }
 
@@ -141,34 +143,34 @@ class NewTabPage extends React.Component<Props, State> {
     const newImageSource = GetBackgroundImageSrc(this.props)
     this.imageSource = newImageSource
     if (newImageSource && oldImageSource !== newImageSource) {
-      this.trackCachedImage()
+     // this.trackCachedImage()
     }
     if (oldImageSource &&
       !newImageSource) {
       // reset loaded state
-      this.setState({ backgroundHasLoaded: false })
+//      this.setState({ backgroundHasLoaded: false })
     }
     if (!GetShouldShowBrandedWallpaperNotification(prevProps) &&
         GetShouldShowBrandedWallpaperNotification(this.props)) {
-      this.trackBrandedWallpaperNotificationAutoDismiss()
+     // this.trackBrandedWallpaperNotificationAutoDismiss()
     }
 
     if (GetShouldShowBrandedWallpaperNotification(prevProps) &&
         !GetShouldShowBrandedWallpaperNotification(this.props)) {
-      this.stopWaitingForBrandedWallpaperNotificationAutoDismiss()
+      //this.stopWaitingForBrandedWallpaperNotificationAutoDismiss()
     }
   }
 
   trackCachedImage () {
     if (this.state.backgroundHasLoaded) {
-      this.setState({ backgroundHasLoaded: false })
+      ///this.setState({ backgroundHasLoaded: false })
     }
     if (this.imageSource) {
       const imgCache = new Image()
       imgCache.src = this.imageSource
-      console.timeStamp('image start loading...')
+      console.log('image start loading...')
       imgCache.onload = () => {
-        console.timeStamp('image loaded')
+        console.log('image loaded')
         this.setState({
           backgroundHasLoaded: true
         })
@@ -200,7 +202,7 @@ class NewTabPage extends React.Component<Props, State> {
 
   toggleShowBackgroundImage = () => {
     this.props.saveShowBackgroundImage(
-      !this.props.newTabData.showBackgroundImage
+      true
     )
   }
 

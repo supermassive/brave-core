@@ -46,7 +46,7 @@ class BackgroundImageSettings extends React.PureComponent<Props, {}> {
             // This option can only be enabled if
             // users opt in for background images
             checked={showBackgroundImage && brandedWallpaperOptIn}
-            disabled={!showBackgroundImage}
+    
             size='small'
           />
         </SettingsRow>

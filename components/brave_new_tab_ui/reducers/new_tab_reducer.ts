@@ -76,7 +76,7 @@ export const newTabReducer: Reducer<NewTab.State | undefined> = (state: NewTab.S
         state.backgroundWallpaper = backgroundAPI.randomBackgroundImage()
       }
       console.timeStamp('reducer initial data received')
-
+      console.log(state)
       performSideEffect(async function (state) {
         if (!state.isIncognito) {
           try {
@@ -90,7 +90,7 @@ export const newTabReducer: Reducer<NewTab.State | undefined> = (state: NewTab.S
       if (state.currentStackWidget) {
         state = storage.migrateStackWidgetSettings(state)
       }
-      state = storage.addNewStackWidget(state)
+      //state = storage.addNewStackWidget(state)
       state = storage.replaceStackWidgets(state)
 
       break
@@ -148,7 +148,7 @@ export const newTabReducer: Reducer<NewTab.State | undefined> = (state: NewTab.S
       newState.isBrandedWallpaperNotificationDismissed = state.isBrandedWallpaperNotificationDismissed
       // Remove branded wallpaper when opting out or turning wallpapers off
       const hasTurnedBrandedWallpaperOff = !preferences.brandedWallpaperOptIn && state.brandedWallpaper
-      const hasTurnedWallpaperOff = !preferences.showBackgroundImage && state.showBackgroundImage
+      const hasTurnedWallpaperOff = false;//!preferences.showBackgroundImage && state.showBackgroundImage
       // We always show SR images regardless of background options state.
       const isSuperReferral = state.brandedWallpaper && !state.brandedWallpaper.isSponsored
       if (!isSuperReferral &&
@@ -161,6 +161,7 @@ export const newTabReducer: Reducer<NewTab.State | undefined> = (state: NewTab.S
       if (shouldChangeBackgroundImage && !newState.backgroundWallpaper) {
         newState.backgroundWallpaper = backgroundAPI.randomBackgroundImage()
       }
+      console.log(newState)
       // Handle updated widget prefs
       state = handleWidgetPrefsChange(newState, state)
       break
