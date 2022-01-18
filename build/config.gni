@@ -41,6 +41,13 @@ declare_args() {
   last_chrome_installer = ""
 }
 
+assert(
+    !is_official_build || skip_signing || is_brave_release_build ||
+        brave_channel == "development" || brave_channel == "nightly",
+    "Normally signed offical builds (beta, stable) should be build on CI with" +
+        "is_brave_release_build = 1. If you need to build them locally," +
+        " add --skip_signing or disable this assert.")
+
 declare_args() {
   if (is_brave_release_build) {
     # Generate all symbols (breakpad + native) for
