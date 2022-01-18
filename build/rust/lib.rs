@@ -7,3 +7,7 @@ pub use speedreader_ffi;
 pub use skus_cxx;
 
 pub use brave_news_cxx;
+
+#[cfg(feature = "enable_rust_bls")]
+pub use bls_cxx;
+
