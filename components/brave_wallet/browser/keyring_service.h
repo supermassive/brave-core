@@ -141,7 +141,6 @@ class KeyringService : public KeyedService, public mojom::KeyringService {
   void ImportFilecoinBLSAccount(
       const std::string& account_name,
       const std::string& private_key,
-      const std::string& public_key,
       const std::string& network,
       ImportFilecoinBLSAccountCallback callback) override;
   void AddHardwareAccounts(
@@ -280,7 +279,6 @@ class KeyringService : public KeyedService, public mojom::KeyringService {
   absl::optional<std::string> ImportBLSAccountForFilecoinKeyring(
       const std::string& account_name,
       const std::vector<uint8_t>& private_key,
-      const std::vector<uint8_t>& public_key,
       const std::string& network);
   bool IsFilecoinAccount(const std::string& account) const;
   bool IsKeyringExist(const std::string& keyring_id) const;
