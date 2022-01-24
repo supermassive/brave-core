@@ -118,6 +118,7 @@ public class Utils {
     public static final String ASSET_LOGO = "assetLogo";
     public static final String ASSET_DECIMALS = "assetDecimals";
     public static final String CHAIN_ID = "chainId";
+    public static final String IS_FROM_DAPPS = "isFromDapps";
     private static final int CLEAR_CLIPBOARD_INTERVAL = 60000; // In milliseconds
 
     public static List<String> getRecoveryPhraseAsList(String recoveryPhrase) {
@@ -411,8 +412,12 @@ public class Utils {
         BigInteger bigNumber = new BigInteger(number, 16);
         BigInteger divider = new BigInteger(getDecimalsDepNumber(decimals));
         BigDecimal bDecimal = new BigDecimal(bigNumber);
-        BigDecimal bDecimalRes = bDecimal.divide(new BigDecimal(divider), MathContext.DECIMAL32);
+        BigDecimal bDecimalRes = bDecimal.divide(new BigDecimal(divider));
         String resStr = bDecimalRes.toPlainString();
+        int integerPlaces = resStr.indexOf('.');
+        if (integerPlaces != -1 && (integerPlaces + 9) <= resStr.length()) {
+            resStr = resStr.substring(0, integerPlaces + 9);
+        }
 
         return Double.valueOf(resStr);
     }
@@ -446,7 +451,13 @@ public class Utils {
         String multiplier = getDecimalsDepNumber(decimals);
         if (dotPosition != -1) {
             int zeroToRemove = number.length() - dotPosition - 1;
-            multiplier = multiplier.substring(0, multiplier.length() - zeroToRemove);
+            if (zeroToRemove < multiplier.length()) {
+                multiplier = multiplier.substring(0, multiplier.length() - zeroToRemove);
+            } else {
+                number = number.substring(
+                        0, number.length() - (zeroToRemove - multiplier.length() + 1));
+                multiplier = "1";
+            }
             number = number.replace(".", "");
         }
         try {
@@ -467,8 +478,12 @@ public class Utils {
         BigInteger bigNumber = new BigInteger(number);
         BigInteger divider = new BigInteger(getDecimalsDepNumber(decimals));
         BigDecimal bDecimal = new BigDecimal(bigNumber);
-        BigDecimal bDecimalRes = bDecimal.divide(new BigDecimal(divider), MathContext.DECIMAL32);
+        BigDecimal bDecimalRes = bDecimal.divide(new BigDecimal(divider));
         String resStr = bDecimalRes.toPlainString();
+        int integerPlaces = resStr.indexOf('.');
+        if (integerPlaces != -1 && (integerPlaces + 9) <= resStr.length()) {
+            resStr = resStr.substring(0, integerPlaces + 9);
+        }
 
         return Double.valueOf(resStr);
     }
@@ -481,7 +496,13 @@ public class Utils {
         String multiplier = getDecimalsDepNumber(decimals);
         if (dotPosition != -1) {
             int zeroToRemove = number.length() - dotPosition - 1;
-            multiplier = multiplier.substring(0, multiplier.length() - zeroToRemove);
+            if (zeroToRemove < multiplier.length()) {
+                multiplier = multiplier.substring(0, multiplier.length() - zeroToRemove);
+            } else {
+                number = number.substring(
+                        0, number.length() - (zeroToRemove - multiplier.length() + 1));
+                multiplier = "1";
+            }
             number = number.replace(".", "");
         }
         BigInteger bigNumber = new BigInteger(number, 10);
