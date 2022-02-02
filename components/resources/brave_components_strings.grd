@@ -895,6 +895,12 @@
       <message name="IDS_BRAVE_UI_WALLET_DISCONNECT" desc="">Disconnect from Brave Rewards</message>
       <message name="IDS_BRAVE_UI_WALLET_CONNECTED" desc="">Connected</message>
 
+      <message name="IDS_BRAVE_UI_PROMO_LEARN_MORE" desc="">Learn more</message>
+      <message name="IDS_BRAVE_UI_PROMO_DISMISS" desc="">Don't show again</message>
+
+      <message name="IDS_BRAVE_UI_BITFLYER_VERIFICATION_PROMO_TITLE" desc="">Verify your wallet</message>
+      <message name="IDS_BRAVE_UI_BITFLYER_VERIFICATION_PROMO_INFO" desc="">Verifying is optional. However, by verifying your wallet, you will be able to withdraw your BAT earned from Brave Rewards to a custodial wallet directly.</message>
+
       <message name="IDS_BRAVE_UI_GEMINI_PROMO_TITLE" desc="">Link Rewards to Gemini!</message>
       <message name="IDS_BRAVE_UI_GEMINI_PROMO_INFO" desc="">Trade 50+ cryptos, including BAT, on Gemini. It&apos;s a secure platform to store your crypto. Plus, you can earn interest in US, HK, and SG.</message>
 

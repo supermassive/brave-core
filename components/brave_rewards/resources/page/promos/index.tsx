@@ -3,6 +3,7 @@
  * You can obtain one at http://mozilla.org/MPL/2.0/. */
 
 import * as React from 'react'
+import bitflyerVerificationBg from './assets/bitflyer_verification_bg.jpg'
 import geminiBg from './assets/gemini_bg.svg'
 import tapBg from './assets/tap_bg.svg'
 import upholdCardBg from './assets/uphold_card_bg.png'
@@ -10,7 +11,7 @@ import upholdEquitiesBg from './assets/uphold_equities_bg.svg'
 import { StyledInfo } from '../../ui/components/sidebarPromo/style'
 import { getLocale } from '../../../../common/locale'
 
-export type PromoType = 'gemini' | 'uphold-card' | 'tap-network' | 'uphold-equities'
+export type PromoType = 'bitflyer-verification' | 'gemini' | 'tap-network' | 'uphold-card' | 'uphold-equities'
 
 export interface Promo {
   title: string
@@ -21,11 +22,19 @@ export interface Promo {
   supportedLocales: string[]
 }
 
-export const getActivePromos = (rewardsData: Rewards.State) => {
+export const getActivePromos = (rewardsData: Rewards.State, isMobile: boolean = false) => {
+  if (!rewardsData || !rewardsData.externalWallet) {
+    return []
+  }
+
+  const wallet = rewardsData.externalWallet
   let promos = []
 
-  if (rewardsData && rewardsData.externalWallet) {
-    const wallet = rewardsData.externalWallet
+  if (isMobile) {
+    if (wallet.type === 'bitflyer') {
+      promos.unshift('bitflyer-verification')
+    }
+  } else {
     if (wallet.type === 'uphold') {
       promos.unshift('tap-network')
       if (wallet.status === 2 && wallet.address) { // WalletStatus::VERIFIED
@@ -41,6 +50,9 @@ export const getActivePromos = (rewardsData: Rewards.State) => {
 
 const getLink = (type: PromoType) => {
   switch (type) {
+    case 'bitflyer-verification': {
+      return 'https://support.brave.com/hc/en-us/articles/4403459972365-%E5%BA%83%E5%91%8A%E9%96%B2%E8%A6%A7%E5%A0%B1%E9%85%AC%E3%81%A7%E7%8D%B2%E5%BE%97%E3%81%97%E3%81%9FBAT%E3%81%AF%E5%BC%95%E3%81%8D%E5%87%BA%E3%81%99%E3%81%93%E3%81%A8%E3%81%8C%E3%81%A7%E3%81%8D%E3%81%BE%E3%81%99%E3%81%8B'
+    }
     case 'gemini': {
       return 'https://www.gemini.com/brave'
     }
@@ -68,6 +80,18 @@ const getRootImagePath = (path: string) => {
 
 export const getPromo = (type: PromoType, rewardsData: Rewards.State) => {
   switch (type) {
+    case 'bitflyer-verification':
+      return {
+        imagePath: getRootImagePath(bitflyerVerificationBg),
+        link: getLink(type),
+        copy: (
+          <>
+            {getLocale('bitflyerVerificationPromoInfo')}
+          </>
+        ),
+        supportedLocales: ['JP'],
+        title: getLocale('bitflyerVerificationPromoTitle')
+      }
     case 'gemini':
       return {
         imagePath: getRootImagePath(geminiBg),
