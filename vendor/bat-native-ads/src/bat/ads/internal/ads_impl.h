@@ -88,6 +88,7 @@ class Catalog;
 class Client;
 class Conversions;
 class ConfirmationsState;
+class CovariateLogs;
 class InlineContentAd;
 class NewTabPageAd;
 class PromotedContentAd;
@@ -257,6 +258,7 @@ class AdsImpl final : public Ads,
   std::unique_ptr<BrowserManager> browser_manager_;
   std::unique_ptr<TabManager> tab_manager_;
   std::unique_ptr<UserActivity> user_activity_;
+  std::unique_ptr<CovariateLogs> covariate_logs_;
 
   void set(privacy::TokenGeneratorInterface* token_generator);
 

@@ -40,6 +40,12 @@
 #include "bat/ads/pref_names.h"
 #include "bat/ads/resources/grit/bat_ads_resources.h"
 #include "bat/ads/statement_info.h"
+// #include "brave/browser/brave_federated/brave_federated_service_factory.h"
+// #include "brave/components/brave_federated/brave_federated_features.h"
+// #include "base/threading/sequence_bound.h"
+// #include "brave/components/brave_federated/data_store_service.h"
+// #include "brave/components/brave_federated/data_stores/ad_notification_timing_data_store.h"
+// #include "brave/components/brave_federated/brave_federated_service.h"
 #include "brave/browser/brave_ads/notification_helper/notification_helper.h"
 #include "brave/browser/brave_ads/notifications/ad_notification_platform_bridge.h"
 #include "brave/browser/brave_ads/service_sandbox_type.h"
@@ -232,6 +238,7 @@ AdsServiceImpl::AdsServiceImpl(
       display_service_(NotificationDisplayService::GetForProfile(profile_)),
       rewards_service_(
           brave_rewards::RewardsServiceFactory::GetForProfile(profile_)),
+      // data_store_service_(brave::BraveFederatedServiceFactory::GetForBrowserContext(profile_)->GetDataStoreService()),
       bat_ads_client_receiver_(new bat_ads::AdsClientMojoBridge(this)) {
   DCHECK(profile_);
 #if BUILDFLAG(BRAVE_ADAPTIVE_CAPTCHA_ENABLED)
@@ -2098,6 +2105,101 @@ void AdsServiceImpl::RecordP2AEvent(const std::string& name,
     }
   }
 }
+
+void AdsServiceImpl::LogTrainingInstance(const ads::mojom::TrainingInstancePtr instance) {
+  // TODO(Moritz Haller): Should we guard |CovariateLogs| in |ads_impl.cc|?
+  // if (!brave::federated::features::IsFederatedLearningEnabled()) {
+  //   return;
+  // }
+
+  // TODO(Moritz Haller): add dev concern ticket to refactor federated DB to
+  // store generic types
+  // brave::federated::AdNotificationTimingTaskLog log;
+
+  for (const auto& covariate : instance->covariates) {
+    switch (covariate->covariate_type) {
+      case ads::mojom::CovariateType::kAdNotificationClicked: {
+        if (covariate->data_type != ads::mojom::DataType::kBool) {
+          VLOG(0) << "covariate type not of type bool";
+          break;
+        }
+
+        bool value_as_bool = false;
+        if (covariate->value == "true") {
+          value_as_bool = true;
+        } else if (covariate->value != "false") {
+          VLOG(0) << "Failed to convert covariate value to bool";
+          return;
+        }
+
+        VLOG(0) << "*** log.label " << value_as_bool;
+        // log.label = value_as_bool;
+        break;
+      }
+
+      case ads::mojom::CovariateType::kLocaleCountryAtTimeOfServing: {
+        if (covariate->data_type != ads::mojom::DataType::kString) {
+          VLOG(0) << "covariate type not of type string";
+          break;
+        }
+
+        VLOG(0) << "*** log.locale " << covariate->value;
+        // log.locale = covariate->value;
+        break;
+      }
+
+      case ads::mojom::CovariateType::kImpressionServedAt: {
+        if (covariate->data_type != ads::mojom::DataType::kDouble) {
+          VLOG(0) << "covariate type not of type double";
+          break;
+        }
+
+        double value_as_double = 0.0;
+        if (!base::StringToDouble(covariate->value, &value_as_double)) {
+          VLOG(0) << "Failed to convert covariate value to double";
+          return;
+        }
+
+        VLOG(0) << "*** log.time " << base::Time::FromDoubleT(value_as_double);
+        // log.time = value_as_double;
+        break;
+      }
+
+      case ads::mojom::CovariateType::kNumberOfTabsOpenedInPast30Minutes: {
+        if (covariate->data_type != ads::mojom::DataType::kInt64) {
+          VLOG(0) << "covariate type not of type int64";
+          break;
+        }
+
+        int64_t value_as_int64 = 0;
+        if (!base::StringToInt64(covariate->value, &value_as_int64)) {
+          VLOG(0) << "Failed to convert covariate value to int64";
+          return;
+        }
+
+        VLOG(0) << "*** log.number_of_tabs " << value_as_int64;
+        // log.number_of_tabs = value_as_int64;
+        break;
+      }
+    }
+  }
+
+  // VLOG(0) << "*** log.label " << log.label;
+  // VLOG(0) << "*** log.locale " << log.locale;
+  // VLOG(0) << "*** log.time " << log.time;
+  // VLOG(0) << "*** log.number_of_tabs " << log.number_of_tabs;
+
+  // const auto* ad_notification_timing_data_store =
+  //     data_store_service->getAdNotificationTimingDataStore();
+  // ad_notification_timing_data_store
+  //       ->AsyncCall(&brave::federated::AdNotificationTimingDataStore::AddLog)
+  //       .WithArgs(log)
+  //       .Then(base::BindOnce(&AdsServiceImpl::OnAddAdNotificationTimingTaskLog,base::Unretained(this)));
+}
+
+// void AdsServiceImpl::OnLogTrainingInstance(bool success) {
+//   VLOG(1) << "*** OnLogTrainingInstance success" << success;
+// }
 
 void AdsServiceImpl::Load(const std::string& name, ads::LoadCallback callback) {
   base::PostTaskAndReplyWithResult(

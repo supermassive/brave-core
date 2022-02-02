@@ -75,6 +75,7 @@ KeyedService* AdsServiceFactory::BuildServiceInstanceFor(
 #endif
                          HistoryServiceFactory::GetInstance()->GetForProfile(
                              profile, ServiceAccessType::EXPLICIT_ACCESS)));
+                        // TODO(Moritz Haller): Inject data store service
   return ads_service.release();
 }
 

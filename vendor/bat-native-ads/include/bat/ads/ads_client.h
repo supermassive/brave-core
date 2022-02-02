@@ -122,6 +122,9 @@ class ADS_EXPORT AdsClient {
                               const mojom::P2AEventType type,
                               const std::string& value) = 0;
 
+  // Add federated log
+  virtual void LogTrainingInstance(const mojom::TrainingInstancePtr instance) = 0;
+
   // Log diagnostic information
   virtual void Log(const char* file,
                    const int line,

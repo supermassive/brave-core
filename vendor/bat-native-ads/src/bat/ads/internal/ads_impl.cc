@@ -21,6 +21,9 @@
 #include "bat/ads/internal/account/confirmations/confirmations_state.h"
 #include "bat/ads/internal/account/wallet/wallet_info.h"
 #include "bat/ads/internal/ad_diagnostics/ad_diagnostics.h"
+#include "bat/ads/internal/federated/covariate_logs.h"
+#include "bat/ads/internal/federated/log_entries/ad_notification_clicked_covariate_log_entry.h"
+#include "bat/ads/internal/federated/log_entries/impression_served_at_covariate_log_entry.h"
 #include "bat/ads/internal/ad_diagnostics/last_unidle_timestamp_ad_diagnostics_entry.h"
 #include "bat/ads/internal/ad_events/ad_events.h"
 #include "bat/ads/internal/ad_server/ad_server.h"
@@ -170,6 +173,24 @@ void AdsImpl::OnHtmlLoaded(const int32_t tab_id,
   ad_transfer_->MaybeTransferAd(tab_id, redirect_chain);
   conversions_->MaybeConvert(redirect_chain, html,
                              conversions_resource_->get());
+
+  // TODO(Moritz Haller): delete, just for testing
+  auto ad_notification_ad_notification_clicked_covariate_log_entry =
+      std::make_unique<AdNotificationClickedCovariateLogEntry>();
+  ad_notification_ad_notification_clicked_covariate_log_entry->SetClicked(true);
+  CovariateLogs::Get()->SetCovariateLogEntry(
+      std::move(ad_notification_ad_notification_clicked_covariate_log_entry));
+
+  auto impression_served_at_covariate_log_entry =
+      std::make_unique<ImpressionServedAtCovariateLogEntry>();
+  impression_served_at_covariate_log_entry->SetLastImpressionTimestamp(
+      base::Time::Now());
+  CovariateLogs::Get()->SetCovariateLogEntry(
+      std::move(impression_served_at_covariate_log_entry));
+
+  mojom::TrainingInstancePtr instance =
+      CovariateLogs::Get()->GetTrainingInstance();
+  AdsClientHelper::Get()->LogTrainingInstance(std::move(instance));
 }
 
 void AdsImpl::OnTextLoaded(const int32_t tab_id,
@@ -570,6 +591,8 @@ void AdsImpl::set(privacy::TokenGeneratorInterface* token_generator) {
   tab_manager_ = std::make_unique<TabManager>();
 
   user_activity_ = std::make_unique<UserActivity>();
+
+  covariate_logs_ = std::make_unique<CovariateLogs>();
 }
 
 void AdsImpl::InitializeBrowserManager() {
@@ -787,6 +810,13 @@ void AdsImpl::OnDidServeAdNotification(const AdNotificationInfo& ad) {
 void AdsImpl::OnAdNotificationViewed(const AdNotificationInfo& ad) {
   account_->DepositFunds(ad.creative_instance_id, ad.type,
                          ConfirmationType::kViewed);
+
+  auto impression_served_at_covariate_log_entry =
+      std::make_unique<ImpressionServedAtCovariateLogEntry>();
+  impression_served_at_covariate_log_entry->SetLastImpressionTimestamp(
+      base::Time::Now());
+  CovariateLogs::Get()->SetCovariateLogEntry(
+      std::move(impression_served_at_covariate_log_entry));
 }
 
 void AdsImpl::OnAdNotificationClicked(const AdNotificationInfo& ad) {
@@ -797,6 +827,16 @@ void AdsImpl::OnAdNotificationClicked(const AdNotificationInfo& ad) {
 
   epsilon_greedy_bandit_processor_->Process(
       {ad.segment, mojom::AdNotificationEventType::kClicked});
+
+  auto ad_notification_ad_notification_clicked_covariate_log_entry =
+      std::make_unique<AdNotificationClickedCovariateLogEntry>();
+  ad_notification_ad_notification_clicked_covariate_log_entry->SetClicked(true);
+  CovariateLogs::Get()->SetCovariateLogEntry(
+      std::move(ad_notification_ad_notification_clicked_covariate_log_entry));
+
+  mojom::TrainingInstancePtr instance =
+      CovariateLogs::Get()->GetTrainingInstance();
+  AdsClientHelper::Get()->LogTrainingInstance(std::move(instance));
 }
 
 void AdsImpl::OnAdNotificationDismissed(const AdNotificationInfo& ad) {
@@ -805,11 +845,31 @@ void AdsImpl::OnAdNotificationDismissed(const AdNotificationInfo& ad) {
 
   epsilon_greedy_bandit_processor_->Process(
       {ad.segment, mojom::AdNotificationEventType::kDismissed});
+
+  auto ad_notification_ad_notification_clicked_covariate_log_entry =
+      std::make_unique<AdNotificationClickedCovariateLogEntry>();
+  ad_notification_ad_notification_clicked_covariate_log_entry->SetClicked(false);
+  CovariateLogs::Get()->SetCovariateLogEntry(
+      std::move(ad_notification_ad_notification_clicked_covariate_log_entry));
+
+  mojom::TrainingInstancePtr instance =
+      CovariateLogs::Get()->GetTrainingInstance();
+  AdsClientHelper::Get()->LogTrainingInstance(std::move(instance));
 }
 
 void AdsImpl::OnAdNotificationTimedOut(const AdNotificationInfo& ad) {
   epsilon_greedy_bandit_processor_->Process(
       {ad.segment, mojom::AdNotificationEventType::kTimedOut});
+
+  auto ad_notification_ad_notification_clicked_covariate_log_entry =
+      std::make_unique<AdNotificationClickedCovariateLogEntry>();
+  ad_notification_ad_notification_clicked_covariate_log_entry->SetClicked(false);
+  CovariateLogs::Get()->SetCovariateLogEntry(
+      std::move(ad_notification_ad_notification_clicked_covariate_log_entry));
+
+  mojom::TrainingInstancePtr instance =
+      CovariateLogs::Get()->GetTrainingInstance();
+  AdsClientHelper::Get()->LogTrainingInstance(std::move(instance));
 }
 
 void AdsImpl::OnAdNotificationEventFailed(

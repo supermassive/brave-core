@@ -212,6 +212,14 @@ void BatAdsClientMojoBridge::RecordP2AEvent(const std::string& name,
   bat_ads_client_->RecordP2AEvent(name, type, value);
 }
 
+void BatAdsClientMojoBridge::LogTrainingInstance(ads::mojom::TrainingInstancePtr instance) {
+  if (!connected()) {
+    return;
+  }
+
+  bat_ads_client_->LogTrainingInstance(std::move(instance));
+}
+
 void OnLoad(const ads::LoadCallback& callback,
             const bool success,
             const std::string& value) {
