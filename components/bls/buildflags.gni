@@ -1,5 +1,5 @@
 import("//brave/build/config.gni")
 
 declare_args() {
-  enable_rust_bls = current_cpu != "x86"
+  enable_rust_bls = true
 }
