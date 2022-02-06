@@ -1,0 +1,22 @@
+diff --git a/components/sync/protocol/proto_value_conversions.h b/components/sync/protocol/proto_value_conversions.h
+index 9657d77c10850a654cf6895d9725f05a3e942fc4..61bee1ec97a87ec76c6a3c4f5823595f422d4788 100644
+--- a/components/sync/protocol/proto_value_conversions.h
++++ b/components/sync/protocol/proto_value_conversions.h
+@@ -73,6 +73,7 @@ class WalletPostalAddress;
+ class WebAppSpecifics;
+ class WifiConfigurationSpecifics;
+ class WorkspaceDeskSpecifics;
++class PairSpecifics;
+ }  // namespace sync_pb
+ 
+ // Keep this file in sync with the .proto files in this directory.
+@@ -259,6 +260,9 @@ std::unique_ptr<base::DictionaryValue> WifiConfigurationSpecificsToValue(
+ std::unique_ptr<base::DictionaryValue> WorkspaceDeskSpecificsToValue(
+     const sync_pb::WorkspaceDeskSpecifics& workspace_desk_specifics);
+ 
++std::unique_ptr<base::DictionaryValue> PairSpecificsToValue(
++    const sync_pb::PairSpecifics& pair_specifics);
++
+ // ToValue functions that allow omitting specifics.
+ 
+ std::unique_ptr<base::DictionaryValue> ClientToServerMessageToValue(

@@ -1,8 +1,16 @@
 diff --git a/chrome/browser/sync/sync_service_factory.cc b/chrome/browser/sync/sync_service_factory.cc
-index 8d918de9f3dd82623114d908dad529e0cff799db..29d7a340831523ce90a782c2980b9eb79b239234 100644
+index 8d918de9f3dd82623114d908dad529e0cff799db..767b46b93b03f3578dc4dee00830aca1e908226e 100644
 --- a/chrome/browser/sync/sync_service_factory.cc
 +++ b/chrome/browser/sync/sync_service_factory.cc
-@@ -164,7 +164,7 @@ std::unique_ptr<KeyedService> BuildSyncService(
+@@ -12,6 +12,7 @@
+ #include "base/memory/singleton.h"
+ #include "base/metrics/histogram_macros.h"
+ #include "base/time/time.h"
++#include "brave/browser/sync_pairs/pair_sync_service_factory.h"
+ #include "build/build_config.h"
+ #include "build/chromeos_buildflags.h"
+ #include "chrome/browser/autofill/personal_data_manager_factory.h"
+@@ -164,7 +165,7 @@ std::unique_ptr<KeyedService> BuildSyncService(
    }
  
    auto sync_service =
@@ -11,3 +19,11 @@ index 8d918de9f3dd82623114d908dad529e0cff799db..29d7a340831523ce90a782c2980b9eb7
    sync_service->Initialize();
  
    // Hook |sync_service| into PersonalDataManager (a circular dependency).
+@@ -254,6 +255,7 @@ SyncServiceFactory::SyncServiceFactory()
+   DependsOn(DeskSyncServiceFactory::GetInstance());
+   DependsOn(WifiConfigurationSyncServiceFactory::GetInstance());
+ #endif  // BUILDFLAG(IS_CHROMEOS_ASH)
++  DependsOn(PairSyncServiceFactory::GetInstance());
+ }
+ 
+ SyncServiceFactory::~SyncServiceFactory() = default;
