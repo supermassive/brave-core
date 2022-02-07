@@ -253,6 +253,7 @@ const string kTrezorHardwareVendor = "Trezor";
 
 const string kFilecoinTestnet = "t";
 const string kFilecoinMainnet = "f";
+const string kFilecoinChainId = "0x1000";
 
 const string kFilecoinKeyringId = "filecoin";
 const string kDefaultKeyringId = "default";

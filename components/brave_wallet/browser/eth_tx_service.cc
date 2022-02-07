@@ -18,6 +18,7 @@
 #include "brave/components/brave_wallet/browser/asset_ratio_service.h"
 #include "brave/components/brave_wallet/browser/brave_wallet_constants.h"
 #include "brave/components/brave_wallet/browser/brave_wallet_prefs.h"
+#include "brave/components/brave_wallet/browser/brave_wallet_utils.h"
 #include "brave/components/brave_wallet/browser/eip1559_transaction.h"
 #include "brave/components/brave_wallet/browser/eth_data_builder.h"
 #include "brave/components/brave_wallet/browser/eth_data_parser.h"
@@ -34,38 +35,9 @@ namespace brave_wallet {
 bool EthTxService::ValidateTxData(const mojom::TxDataPtr& tx_data,
                                   std::string* error) {
   CHECK(error);
-  // To cannot be empty if data is not specified
-  if (tx_data->data.size() == 0 && tx_data->to.empty()) {
-    *error =
-        l10n_util::GetStringUTF8(IDS_WALLET_ETH_SEND_TRANSACTION_TO_OR_DATA);
-    return false;
-  }
-
-  // If the following fields are specified, they must be valid hex strings
-  if (!tx_data->nonce.empty() && !IsValidHexString(tx_data->nonce)) {
-    *error =
-        l10n_util::GetStringUTF8(IDS_WALLET_ETH_SEND_TRANSACTION_NONCE_INVALID);
-    return false;
-  }
-  if (!tx_data->gas_price.empty() && !IsValidHexString(tx_data->gas_price)) {
-    *error = l10n_util::GetStringUTF8(
-        IDS_WALLET_ETH_SEND_TRANSACTION_GAS_PRICE_INVALID);
-    return false;
-  }
-  if (!tx_data->gas_limit.empty() && !IsValidHexString(tx_data->gas_limit)) {
-    *error = l10n_util::GetStringUTF8(
-        IDS_WALLET_ETH_SEND_TRANSACTION_GAS_LIMIT_INVALID);
-    return false;
-  }
-  if (!tx_data->value.empty() && !IsValidHexString(tx_data->value)) {
-    *error =
-        l10n_util::GetStringUTF8(IDS_WALLET_ETH_SEND_TRANSACTION_VALUE_INVALID);
-    return false;
-  }
-  // to must be a valid address if specified
-  if (!tx_data->to.empty() && EthAddress::FromHex(tx_data->to).IsEmpty()) {
-    *error =
-        l10n_util::GetStringUTF8(IDS_WALLET_ETH_SEND_TRANSACTION_TO_INVALID);
+  if (!ValidateCommonTxData(tx_data, error) &&
+      EthAddress::FromHex(tx_data->to).IsEmpty()) {
+    *error = l10n_util::GetStringUTF8(IDS_WALLET_SEND_TRANSACTION_TO_INVALID);
     return false;
   }
   return true;
@@ -153,7 +125,7 @@ void EthTxService::AddUnapprovedTransaction(
   if (from.empty()) {
     std::move(callback).Run(
         false, "",
-        l10n_util::GetStringUTF8(IDS_WALLET_ETH_SEND_TRANSACTION_FROM_EMPTY));
+        l10n_util::GetStringUTF8(IDS_WALLET_SEND_TRANSACTION_FROM_EMPTY));
     return;
   }
   std::string error;
@@ -277,7 +249,7 @@ void EthTxService::AddUnapproved1559Transaction(
   if (from.empty()) {
     std::move(callback).Run(
         false, "",
-        l10n_util::GetStringUTF8(IDS_WALLET_ETH_SEND_TRANSACTION_FROM_EMPTY));
+        l10n_util::GetStringUTF8(IDS_WALLET_SEND_TRANSACTION_FROM_EMPTY));
     return;
   }
   std::string error;

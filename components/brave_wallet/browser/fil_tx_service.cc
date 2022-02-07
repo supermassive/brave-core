@@ -17,21 +17,34 @@
 #include "base/strings/string_util.h"
 #include "brave/components/brave_wallet/browser/brave_wallet_constants.h"
 #include "brave/components/brave_wallet/browser/brave_wallet_prefs.h"
-#include "brave/components/brave_wallet/browser/eth_data_parser.h"
+#include "brave/components/brave_wallet/browser/brave_wallet_utils.h"
 #include "brave/components/brave_wallet/browser/json_rpc_service.h"
 #include "brave/components/brave_wallet/browser/keyring_service.h"
+#include "brave/components/brave_wallet/common/fil_address.h"
 #include "brave/components/brave_wallet/common/hex_utils.h"
 #include "components/grit/brave_components_strings.h"
 #include "ui/base/l10n/l10n_util.h"
 
 namespace brave_wallet {
 
+// static
+bool FilTxService::ValidateTxData(const mojom::TxDataPtr& tx_data,
+                                  std::string* error) {
+  CHECK(error);
+  if (!ValidateCommonTxData(tx_data, error) ||
+      !FilAddress::IsValidAddress(tx_data->to)) {
+    *error = l10n_util::GetStringUTF8(IDS_WALLET_SEND_TRANSACTION_TO_INVALID);
+    return false;
+  }
+  return true;
+}
+
 FilTxService::FilTxService(
     JsonRpcService* json_rpc_service,
     KeyringService* keyring_service,
     AssetRatioService* asset_ratio_service,
     std::unique_ptr<EthTxStateManager> tx_state_manager,
-    std::unique_ptr<EthNonceTracker> nonce_tracker,
+    std::unique_ptr<FilNonceTracker> nonce_tracker,
     std::unique_ptr<EthPendingTxTracker> pending_tx_tracker,
     PrefService* prefs)
     : json_rpc_service_(json_rpc_service),
@@ -67,6 +80,17 @@ void FilTxService::AddUnapprovedTransaction(
     mojom::TxDataPtr tx_data,
     const std::string& from,
     AddUnapprovedTransactionCallback callback) {
+  if (from.empty()) {
+    std::move(callback).Run(
+        false, "",
+        l10n_util::GetStringUTF8(IDS_WALLET_SEND_TRANSACTION_FROM_EMPTY));
+    return;
+  }
+  std::string error;
+  if (!FilTxService::ValidateTxData(tx_data, &error)) {
+    std::move(callback).Run(false, "", error);
+    return;
+  }
   // NOT IMPLEMENTED
   std::move(callback).Run(false, "", "");
 }

@@ -9,7 +9,8 @@ import {
 } from '../constants/types'
 
 export function isValidFilAddress (value: string): boolean {
-  if (!value.startsWith(BraveWallet.FILECOIN_MAINNET) && !value.startsWith(BraveWallet.FILECOIN_TESTNET)) {
+  if (!value.startsWith(BraveWallet.FILECOIN_MAINNET) &&
+      !value.startsWith(BraveWallet.FILECOIN_TESTNET)) {
     return false
   }
   return (value.length === 41 || value.length === 86)

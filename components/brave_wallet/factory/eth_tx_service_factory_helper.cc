@@ -39,13 +39,13 @@ std::unique_ptr<FilTxService> BuildFilTxService(
     PrefService* prefs) {
   auto tx_state_manager =
       std::make_unique<EthTxStateManager>(prefs, json_rpc_service);
-  auto eth_nonce_tracker = std::make_unique<EthNonceTracker>(
+  auto fil_nonce_tracker = std::make_unique<FilNonceTracker>(
       tx_state_manager.get(), json_rpc_service);
   auto eth_pending_tx_tracker = std::make_unique<EthPendingTxTracker>(
-      tx_state_manager.get(), json_rpc_service, eth_nonce_tracker.get());
+      tx_state_manager.get(), json_rpc_service, nullptr);
   return std::make_unique<FilTxService>(
       json_rpc_service, keyring_service, asset_ratio_service,
-      std::move(tx_state_manager), std::move(eth_nonce_tracker),
+      std::move(tx_state_manager), std::move(fil_nonce_tracker),
       std::move(eth_pending_tx_tracker), prefs);
 }
 

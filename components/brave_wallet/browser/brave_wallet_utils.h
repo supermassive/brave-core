@@ -106,6 +106,9 @@ mojom::EthereumChainPtr GetChain(PrefService* prefs,
 // Get the current chain ID from kBraveWalletCurrentChainId pref.
 std::string GetCurrentChainId(PrefService* prefs);
 
+// Validates transaction data and returns error if data is invalid.
+bool ValidateCommonTxData(const mojom::TxDataPtr& tx_data, std::string* error);
+
 }  // namespace brave_wallet
 
 #endif  // BRAVE_COMPONENTS_BRAVE_WALLET_BROWSER_BRAVE_WALLET_UTILS_H_

@@ -25,11 +25,13 @@
 #include "brave/components/brave_wallet/common/hex_utils.h"
 #include "brave/components/brave_wallet/common/value_conversion_utils.h"
 #include "brave/vendor/bip39wally-core-native/include/wally_bip39.h"
+#include "components/grit/brave_components_strings.h"
 #include "components/prefs/pref_service.h"
 #include "components/prefs/scoped_user_pref_update.h"
 #include "crypto/random.h"
 #include "third_party/abseil-cpp/absl/types/optional.h"
 #include "third_party/boringssl/src/include/openssl/evp.h"
+#include "ui/base/l10n/l10n_util.h"
 #include "url/gurl.h"
 
 #if defined(OS_WIN)
@@ -89,6 +91,15 @@ const brave_wallet::mojom::EthereumChain kFilecoinNetworks[] = {
      18,
      true},
     {"0x1001",
+     "Filecoin Testnet",
+     {},
+     {},
+     {"https://calibration.node.glif.io/rpc/v0"},
+     "FIL",
+     "Filecoin",
+     18,
+     true},
+    {"0x1002",
      "Filecoin Testnet",
      {},
      {},
@@ -786,6 +797,38 @@ void RemoveCustomNetwork(PrefService* prefs,
 
 std::string GetCurrentChainId(PrefService* prefs) {
   return prefs->GetString(kBraveWalletCurrentChainId);
+}
+
+bool ValidateCommonTxData(const mojom::TxDataPtr& tx_data, std::string* error) {
+  CHECK(error);
+  // To cannot be empty if data is not specified
+  if (tx_data->data.size() == 0 && tx_data->to.empty()) {
+    *error = l10n_util::GetStringUTF8(IDS_WALLET_SEND_TRANSACTION_TO_OR_DATA);
+    return false;
+  }
+
+  // If the following fields are specified, they must be valid hex strings
+  if (!tx_data->nonce.empty() && !IsValidHexString(tx_data->nonce)) {
+    *error =
+        l10n_util::GetStringUTF8(IDS_WALLET_SEND_TRANSACTION_NONCE_INVALID);
+    return false;
+  }
+  if (!tx_data->gas_price.empty() && !IsValidHexString(tx_data->gas_price)) {
+    *error =
+        l10n_util::GetStringUTF8(IDS_WALLET_SEND_TRANSACTION_GAS_PRICE_INVALID);
+    return false;
+  }
+  if (!tx_data->gas_limit.empty() && !IsValidHexString(tx_data->gas_limit)) {
+    *error =
+        l10n_util::GetStringUTF8(IDS_WALLET_SEND_TRANSACTION_GAS_LIMIT_INVALID);
+    return false;
+  }
+  if (!tx_data->value.empty() && !IsValidHexString(tx_data->value)) {
+    *error =
+        l10n_util::GetStringUTF8(IDS_WALLET_SEND_TRANSACTION_VALUE_INVALID);
+    return false;
+  }
+  return true;
 }
 
 }  // namespace brave_wallet

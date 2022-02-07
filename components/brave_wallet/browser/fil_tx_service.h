@@ -11,9 +11,9 @@
 #include <vector>
 
 #include "base/memory/raw_ptr.h"
-#include "brave/components/brave_wallet/browser/eth_nonce_tracker.h"
 #include "brave/components/brave_wallet/browser/eth_pending_tx_tracker.h"
 #include "brave/components/brave_wallet/browser/eth_tx_state_manager.h"
+#include "brave/components/brave_wallet/browser/fil_nonce_tracker.h"
 #include "brave/components/brave_wallet/common/brave_wallet.mojom.h"
 #include "components/keyed_service/core/keyed_service.h"
 #include "mojo/public/cpp/bindings/pending_remote.h"
@@ -40,7 +40,7 @@ class FilTxService : public KeyedService,
                         KeyringService* keyring_service,
                         AssetRatioService* asset_ratio_service,
                         std::unique_ptr<EthTxStateManager> tx_state_manager,
-                        std::unique_ptr<EthNonceTracker> nonce_tracker,
+                        std::unique_ptr<FilNonceTracker> nonce_tracker,
                         std::unique_ptr<EthPendingTxTracker> pending_tx_tracker,
                         PrefService* prefs);
   ~FilTxService() override;
@@ -147,7 +147,7 @@ class FilTxService : public KeyedService,
   raw_ptr<AssetRatioService> asset_ratio_service_ = nullptr;  // NOT OWNED
   raw_ptr<PrefService> prefs_ = nullptr;                      // NOT OWNED
   std::unique_ptr<EthTxStateManager> tx_state_manager_;
-  std::unique_ptr<EthNonceTracker> nonce_tracker_;
+  std::unique_ptr<FilNonceTracker> nonce_tracker_;
   std::unique_ptr<EthPendingTxTracker> pending_tx_tracker_;
   bool known_no_pending_tx = false;
 
