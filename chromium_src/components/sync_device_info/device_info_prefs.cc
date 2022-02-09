@@ -31,10 +31,6 @@ void DeviceInfoPrefs::SetResetDevicesProgressTokenDone() {
   pref_service_->SetTime(kResetDevicesProgressTokenTime, base::Time::Now());
 }
 
-std::string DeviceInfoPrefs::GetResetDevicesProgressTokenTimeName() {
-  return kResetDevicesProgressTokenTime;
-}
-
 void DeviceInfoPrefs::RegisterProfilePrefs(PrefRegistrySimple* registry) {
   registry->RegisterTimePref(kResetDevicesProgressTokenTime, base::Time());
   RegisterProfilePrefs_ChromiumImpl(registry);

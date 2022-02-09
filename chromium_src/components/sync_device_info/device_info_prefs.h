@@ -10,10 +10,9 @@
   RegisterProfilePrefs_ChromiumImpl(PrefRegistrySimple* registry); \
   static void RegisterProfilePrefs
 
-#define GarbageCollectExpiredCacheGuids                      \
-  SetResetDevicesProgressTokenDone();                        \
-  bool IsResetDevicesProgressTokenDone();                    \
-  static std::string GetResetDevicesProgressTokenTimeName(); \
+#define GarbageCollectExpiredCacheGuids   \
+  SetResetDevicesProgressTokenDone();     \
+  bool IsResetDevicesProgressTokenDone(); \
   void GarbageCollectExpiredCacheGuids
 
 #include "src/components/sync_device_info/device_info_prefs.h"
