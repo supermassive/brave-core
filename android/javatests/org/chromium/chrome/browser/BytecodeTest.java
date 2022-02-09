@@ -302,18 +302,6 @@ public class BytecodeTest {
         Assert.assertTrue(methodExists(
                 "org/chromium/chrome/browser/search_engines/settings/SearchEngineSettings",
                 "createAdapterIfNecessary", false, null));
-        Assert.assertTrue(methodExists(
-                "org/chromium/chrome/browser/tasks/tab_management/TabUiFeatureUtilities",
-                "isGridTabSwitcherEnabled", false, null));
-        Assert.assertTrue(methodExists(
-                "org/chromium/chrome/browser/tasks/tab_management/TabUiFeatureUtilities",
-                "isTabGroupsAndroidEnabled", false, null));
-        Assert.assertTrue(methodExists(
-                "org/chromium/chrome/browser/tasks/tab_management/BraveTabUiFeatureUtilities",
-                "isGridTabSwitcherEnabled", false, null));
-        Assert.assertTrue(methodExists(
-                "org/chromium/chrome/browser/tasks/tab_management/BraveTabUiFeatureUtilities",
-                "isTabGroupsAndroidEnabled", false, null));
         Assert.assertTrue(methodExists("org/chromium/chrome/browser/feed/FeedSurfaceCoordinator",
                 "isReliabilityLoggingEnabled", false, null));
         Assert.assertTrue(
