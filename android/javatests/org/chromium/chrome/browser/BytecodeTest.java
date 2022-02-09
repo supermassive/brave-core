@@ -198,10 +198,6 @@ public class BytecodeTest {
         Assert.assertTrue(
                 classExists("org/chromium/components/permissions/BravePermissionDialogModel"));
         Assert.assertTrue(classExists("org/chromium/components/permissions/PermissionDialogModel"));
-        Assert.assertTrue(classExists(
-                "org/chromium/chrome/browser/tasks/tab_management/TabUiFeatureUtilities"));
-        Assert.assertTrue(classExists(
-                "org/chromium/chrome/browser/tasks/tab_management/BraveTabUiFeatureUtilities"));
         Assert.assertTrue(classExists("org/chromium/chrome/browser/omnibox/status/StatusMediator"));
         Assert.assertTrue(
                 classExists("org/chromium/chrome/browser/omnibox/status/BraveStatusMediator"));
