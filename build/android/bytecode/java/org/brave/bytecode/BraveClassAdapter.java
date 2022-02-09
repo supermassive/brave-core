@@ -29,7 +29,6 @@ public class BraveClassAdapter {
         chain = new BraveIncognitoToggleTabLayoutClassAdapter(chain);
         chain = new BraveIntentHandlerClassAdapter(chain);
         chain = new BraveLaunchIntentDispatcherClassAdapter(chain);
-        chain = new BraveLayoutManagerChromeClassAdapter(chain);
         chain = new BraveMainPreferenceBaseClassAdapter(chain);
         chain = new BraveManageSyncSettingsClassAdapter(chain);
         chain = new BraveMenuButtonCoordinatorClassAdapter(chain);

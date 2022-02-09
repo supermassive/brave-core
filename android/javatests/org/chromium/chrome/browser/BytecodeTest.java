@@ -199,10 +199,6 @@ public class BytecodeTest {
                 classExists("org/chromium/components/permissions/BravePermissionDialogModel"));
         Assert.assertTrue(classExists("org/chromium/components/permissions/PermissionDialogModel"));
         Assert.assertTrue(classExists(
-                "org/chromium/chrome/browser/compositor/layouts/LayoutManagerChromePhone"));
-        Assert.assertTrue(classExists(
-                "org/chromium/chrome/browser/compositor/layouts/BraveLayoutManagerChrome"));
-        Assert.assertTrue(classExists(
                 "org/chromium/chrome/browser/tasks/tab_management/TabUiFeatureUtilities"));
         Assert.assertTrue(classExists(
                 "org/chromium/chrome/browser/tasks/tab_management/BraveTabUiFeatureUtilities"));
@@ -721,9 +717,6 @@ public class BytecodeTest {
                 "org/chromium/chrome/browser/toolbar/top/BraveToolbarLayoutImpl"));
         Assert.assertTrue(checkSuperName("org/chromium/chrome/browser/toolbar/top/ToolbarTablet",
                 "org/chromium/chrome/browser/toolbar/top/BraveToolbarLayoutImpl"));
-        Assert.assertTrue(checkSuperName(
-                "org/chromium/chrome/browser/compositor/layouts/LayoutManagerChromePhone",
-                "org/chromium/chrome/browser/compositor/layouts/BraveLayoutManagerChrome"));
         Assert.assertTrue(checkSuperName(
                 "org/chromium/components/browser_ui/site_settings/SingleCategorySettings",
                 "org/chromium/components/browser_ui/site_settings/BraveSingleCategorySettings"));
