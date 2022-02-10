@@ -18,7 +18,7 @@ import {
 import { Provider } from '../../ui/components/profile'
 
 // Utils
-import { getLocale } from '../../../../common/locale'
+import { getLocale, getLocaleWithTags } from '../../../../common/locale'
 import * as rewardsActions from '../actions/rewards_actions'
 import * as utils from '../utils'
 import { DetailRow } from '../../ui/components/tableDonation'
@@ -157,6 +157,21 @@ class TipBox extends React.Component<Props, State> {
     )
   }
 
+  getDescriptionChild = () => {
+    const text = getLocaleWithTags('donationDesc', 1)
+    return (
+      text.length == 1
+      ? <>
+          {text[0].beforeTag}
+          <a href = {'https://support.brave.com/hc/en-us/articles/360021123971-How-do-I-tip-websites-and-Content-Creators-in-Brave-Rewards-'} target = {'_blank'}>
+            {text[0].duringTag}
+          </a>
+          {text[0].afterTag}
+      </>
+      : null
+    )
+  }
+
   render () {
     const { parameters, tipsList } = this.props.rewardsData
     const tipRows = this.getTipsRows()
@@ -170,7 +185,7 @@ class TipBox extends React.Component<Props, State> {
       <Box
         title={getLocale('donationTitle')}
         type={'donation'}
-        description={getLocale('donationDesc')}
+        description={this.getDescriptionChild()}
         settingsChild={this.donationSettingsChild()}
         settingsOpened={this.state.settings}
         onSettingsClick={this.onSettingsToggle}
